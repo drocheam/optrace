@@ -88,6 +88,28 @@ that can include parameters from :obj:`matplotlib.pyplot.savefig`.
    otp.any_plotting_function(..., path="./results/image.jpeg", sargs=dict(dpi=150, pad_inches=0, transparent=True))
 
 
+Changing Fonts and Other Plot Settings
+___________________________________________
+
+By default, serif-fonts are used for publication-like plots.
+Plot settings for :mod:`matplotlib` can be changed globally by using :obj:`matplotlib.rcParams`.
+To change to sans serif fonts, do:
+
+.. code-block:: python
+
+   import optrace as ot
+   import optrace.plots as otp
+   import matplotlib
+
+   ...
+
+   # needs to be set after importing optrace.plots
+   matplotlib.rcParams['mathtext.fontset'] = 'dejavusans'
+   matplotlib.rcParams['font.family'] = 'sans serif'
+
+Depending on the installed fonts on your system,
+you need to change :python:`'dejavusans'` to a different sans-serif font.
+
 .. _surface_plotting:
 
 Plotting Surfaces

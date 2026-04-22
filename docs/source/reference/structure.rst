@@ -1,7 +1,7 @@
 Library Structure
 ----------------------------
 
-**Library Structure**
+**Library Folder Tree**
 
 .. highlight:: none
 
@@ -11,7 +11,7 @@ Library Structure
 .. highlight:: default
 
 
-**Example Structure**
+**Example Folder Tree**
 
 .. highlight:: none
 

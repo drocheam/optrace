@@ -88,6 +88,6 @@ This project is not affiliated with a package of the same name on PyPI.
 
 * Consult the `pyvista issues <https://github.com/pyvista/pyvista/issues>`__, 
   `vtk issues <https://gitlab.kitware.com/vtk/vtk/-/issues>`__ 
-  or `PySide issues <https://bugreports.qt.io/projects/PYSIDE/issues/>`__ for current problems and solutions
+  or `PySide issues <https://bugreports.qt.io/projects/PYSIDE/issues/>`__ for current issues and solutions
 
 

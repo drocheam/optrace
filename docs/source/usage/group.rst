@@ -204,7 +204,7 @@ When given a desired object magnification :math:`m`, the image distance paramete
 
 .. math::
 
-   m = \frac{b}{g} \Rightarrow b = m \cdot g
+   m = \frac{b}{g} \Rightarrow b = m \, g
 
 Which should be known from the fundamentals of optics.
 Where :math:`g` is the object distance, in our example :python:`z_g - cam_pos[2]`.

@@ -12,13 +12,14 @@ Documentation
 Overview
 _______________________
 
-The documentation should contain information about the project, its usage as well as implementation and programming details.
-All should be presented as easily navigable webpage which includes figures, equations and code snippets.
+The documentation contains information about the project, its usage as well as implementation and programming details.
+Everything should be presented as easily navigable webpage which includes figures, equations and code snippets.
 
-To allow for a simple and up-to-date code reference the process should be automatic, by generating it from 
+To allow for a simple and up-to-date code reference, the process should be automatic, by generating it from 
 `typing hints <https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html>`_ 
-and  `docstrings <https://peps.python.org/pep-0257/>`_. 
+and `docstrings <https://peps.python.org/pep-0257/>`_. 
 
+The online documentation is located `here <https://drocheam.github.io/optrace/index.html>`__.
 
 Workflow
 _______________________
@@ -39,7 +40,7 @@ __________________________________
 
 The documentation is created with `Sphinx <https://www.sphinx-doc.org/en/master/>`_, 
 which uses `reStructuredText <https://docutils.sourceforge.io/docs/user/rst/quickref.html>`_ as markup language. 
-The html builder of Sphinx compiles a webpage including the self-written documentation, 
+The html builder of Sphinx compiles a webpage including the written documentation, 
 automatically generated code information, as well as indices for searching.
 
 The following extensions are used:
@@ -58,7 +59,7 @@ The following extensions are used:
    * - `sphinxcontrib.bibtex <https://sphinxcontrib-bibtex.readthedocs.io/en/latest/>`_ 
      - bibliography management
    * - `Shibuya Sphinx Theme <https://shibuya.lepture.com/>`_
-     - A modern looking theme
+     - A modern theme
    * - `Sphinx Sitemap <https://sphinx-sitemap.readthedocs.io/en/latest/index.html>`_
      - Generate sitemaps while building the documentation
    * - `Sphinx Mathjax Offline <https://pypi.org/project/sphinx-mathjax-offline/>`_

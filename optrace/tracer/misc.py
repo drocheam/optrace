@@ -42,11 +42,11 @@ def timer(func: Callable) -> Any:
     """
     @wraps(func)
     def _time_it(*args, **kwargs) -> Any:
-        start = time.time()
+        start = time.perf_counter()
         try:
             return func(*args, **kwargs)
         finally:
-            diff = time.time() - start
+            diff = time.perf_counter() - start
 
             unit = "ms" if diff < 0.1 else "s"
             time_ = 1000*diff if diff < 0.1 else diff

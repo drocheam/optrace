@@ -15,26 +15,30 @@
 
 optrace (OPtics rayTRACEr) is a scripting based optics simulation package, developed at the 
 [Institute for Applied Optics and Electronics](https://www.th-koeln.de/informations-medien-und-elektrotechnik/institut-fuer-angewandte-optik-und-elektronik-aoe_14804.php) 
-at the TH Köln - University of Applied Science in Cologne, Germany.
+at the TH Köln – University of Applied Science in Cologne, Germany.
 It features sequential raytracing, image rendering capabilities and a graphical user interface.
 This tool is designed with a focus on image simulation with accurate color handling, 
 differentiating it from other raytracers that may prioritize engineering workflows.
 
 optrace is suitable for educational purposes, enabling the creation of interactive applications 
-with custom user interfaces through Python scripting and comprehensive documentation. 
+through Python scripting and comprehensive documentation. 
 Its interactive 3D scene viewer allows for hands-on exploration of optical principles.
 
 Furthermore, optrace's automation features and extensibility, including support for custom surfaces and materials, 
 make it a viable tool for research applications. 
+As such, optrace has already been used for the simulation of intraocular lenses in two peer-reviewed publications 
+in the journal *Translational Vision Science & Technology*
+([Paper 1](https://doi.org/10.1167/tvst.13.8.33), [Paper 2](https://doi.org/10.1167/tvst.14.12.33>)).
+
 
  **Features**
-  * Free and open source software
-  * Programming/scripting approach to simulation
   * Sequential raytracing for geometrical optics
+  * Free and open source software
+  * Programming/scripting approach to optics simulation
   * Rendering of colored detector images
   * Paraxial analysis (matrix optics, cardinal points/planes and PSF convolution)
-  * Includes preset and user-definable surface shapes, ray sources, and media
-  * An additional GUI with an interactive 3D scene viewer
+  * Includes presets and user-definable surface shapes, ray sources, and media
+  * Optional GUI with an interactive 3D scene viewer
   * Automation capabilities
   * High performance of 85 ms / surface / million rays 
     ([details](https://drocheam.github.io/optrace/development/testing.html#benchmark-testing))
@@ -44,7 +48,7 @@ make it a viable tool for research applications.
   * Coding-free simulations are not supported
   * Wave optics effects such as diffraction and interference are not included
   * No non-sequential raytracing for simulating ghost images and reflections
-  * Mirror or fresnel lens optics are not supported
+  * Mirror or Fresnel lens optics are not supported
   * No modelling of scattering effects or polarization-dependent media
   * No functionality for lens optimization, aberration analysis, and tolerancing
  

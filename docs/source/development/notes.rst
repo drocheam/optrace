@@ -14,7 +14,7 @@ Notes
 * plotting and TraceGUI are independent of the tracing backend
 * automation/scripting easily possible
 * platform independent and open source
-* importing only the backend tracing functionality does not import GUI and plotting libraries. This ensures better performance and enables us to use this functionality without ever needing to install this heavy libraries when they are never needed.
+* importing only the backend tracing functionality does not import GUI and plotting libraries. This ensures better starting performance and enables us to use this functionality without ever needing to install this heavy libraries when they are never needed.
 
 **Dependencies**
 
@@ -51,7 +51,7 @@ Notes
 * outsource heavy tasks onto multiple cores
 * prefer threads over processes (no copying overhead). However we need to:
    * ensure there are no race conditions by using locks or by ensuring each thread writes on a different memory location
-   * minimize python code (because of the GIL limitation while multithreading). Use lower level libraries with like numpy
+   * minimize python code (because of the GIL limitation while multithreading). Use lower level libraries like numpy
 
 * all worker and background threads need to terminate immediately when the main thread has ended
   This is ensured by providing :python:`daemon=True` while creating the :class:`Thread <threading.Thread>` object.
@@ -103,9 +103,9 @@ Notes
 
 * functions and classes that are exposed to the user should have type and value checking
 * some people will tell you "this is not the pythonic way", however:
-   * clear error messages are more helpful than needing to debug for 30 minutes
+   * clear error messages are better than needing to debug for 30 minutes
    * some values produce results that are valid mathematically, but impossible according to physics (e.g. negative energies, zero sized geometries etc.). 
-   * even I as developer do not remember the types and value ranges for all parameters and the correct function usage
+   * even I as the developer do not remember the types and value ranges for all parameters and the correct function usage
 
 **Object and Geometry Locks**
 
@@ -128,7 +128,7 @@ Notes
 
 * ``CamelCase`` class names, ``lower_case_with_underscores`` for functions, filenames, parameters. 
   Note that the latter this is not always possible for mathematical or physical quantities with standardized symbols
-* increased line length of 120 characters
+* increased line length used for coding to 120 characters
 * prefer writing out keyword arguments (:python:`function(width=1026, height=4596)`)
   for readability and simpler documentation
 * use of docstrings for functions, classes and important variables
@@ -144,11 +144,11 @@ Notes
 
 **Responsiveness**
 
-* some actions need time, but the program should still appear active and responsive. Hence, we need to notify the user with:
-   * a message that something has been started / processed/ approved
+* some actions need much time, but the program should still appear active and responsive. Hence, we need to notify the user with:
+   * a message stating that something has been started / processed/ approved
    * a progress bar indicating the progress and estimated remaining time. 
-     Also distracts the user, lowering the subjective waiting time
+     This also distracts the user, lowering the subjective waiting time
 * TraceGUI actions like tracing, focussing etc. need to run in background threads, 
-  so the scene and main UI thread are responsive
+  so the scene and main UI thread can and should be responsive
 
 

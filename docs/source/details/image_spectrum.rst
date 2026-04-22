@@ -13,7 +13,7 @@ Image Rendering
 
 Image rendering consists of two main stages: 
 
-1. Hit detection with the detector
+1. Hit detection on the detector
 2. Image calculation from ray position and weights
 
 Determining hits for a detector is more complex than for a standard surface,
@@ -21,11 +21,11 @@ as there are no specific constraints on the detector's position.
 Consequently, the detector can potentially be located within other surfaces.
 
 Rather than calculating a single surface hit, intersections are computed for all sections of a ray 
-that lie within the detector's z-range. 
+that lie within the detector's z-range specified by its surface shape. 
 Once the coordinates of a potential hit are determined,
 it is necessary to verify if these coordinates fall within the defined region of the ray section, 
 thereby confirming a valid hit. 
-In some cases, only the virtual extension of the ray section may intersect with the surface, 
+In some cases, only the virtual extension of the ray section intersects with the surface, 
 while the ray itself may have altered its direction due to the refraction on an adjacent surface.
 
 To enhance efficiency, these calculations are executed in parallel threads, 
@@ -33,28 +33,30 @@ with each thread processing a subset of rays.
 Rays that do not reach the detector, whether because they begin ahead of it or are absorbed prior to reaching it, 
 are filtered out as early as possible in the process.
 
-Upon completing the procedure, it becomes clear whether each ray impacts the detector 
+Upon completing the procedure, it becomes apparent whether each ray impacts the detector 
 and the specific location of this impact. 
 If the user specifies an extent option, only rays falling within this extent are selected. 
 Otherwise, an automatic rectangular extent is calculated based on the outermost ray intersections.
 
 If the detector is non-planar (e.g., a section of a sphere), the coordinates are initially mapped using 
-a projection method as described in :numref:`sphere_projections`. 
+a projection method as described in :numref:`sphere_projections`.
+
 For all intersecting rays, a two-dimensional histogram is generated based on a predefined pixel size. 
-The pixel count exceeds the requested amount because each image is rendered at a higher resolution, 
+The pixel count exceeds the requested, user-provided number because internally 
+each image is rendered at a higher resolution, 
 allowing for resolution adjustments post-rendering, as detailed in :numref:`rimage_rendering`.
 
-Image rendering is performed using parallel threads. 
-The generated `RenderImage` object comprises images for the three tristimulus values X, Y, and Z, 
+Image rendering is performed using multithreading. 
+The generated :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>`
+object comprises images for the three tristimulus values X, Y, and Z, 
 which can represent the full spectrum of human-visible colors. 
 An illuminance image is directly derivable from the Y component and the pixel size, 
 negating the need for explicit rendering of this image. 
 The fourth image is an irradiance image, calculated from the ray powers and pixel sizes. 
-Each thread is assigned one of these four images to process.
+Each thread is assigned one of these four images for processing.
 
 Following image rendering, the final image may be optionally filtered with an Airy-disk resolution filter 
 (see :numref:`image_airy_filter`) and then rescaled to the desired resolution.
-
 
 .. figure:: ../images/DetectorPAP.svg
    :width: 400
@@ -89,8 +91,8 @@ The following equation is an adaptation from :footcite:`EquidistantProjWiki`:
 The projected coordinates are given by:
 
 .. math::
-   x_p &= -\theta \cdot \text{sgn}(R) \cos(\phi)\\
-   y_p &= -\theta \cdot \text{sgn}(R) \sin(\phi)\\
+   x_p &= -\theta \,\text{sgn}(R) \cos(\phi)\\
+   y_p &= -\theta \,\text{sgn}(R) \sin(\phi)\\
    :label: equidistant_proj_eq
 
 **Orthographic**
@@ -100,7 +102,7 @@ For further reference, see :footcite:`OrthographicProjWiki`.
 
 **Stereographic**
 
-The following formulation is adapted from :footcite:`SteographicProjWiki`:
+The following formulation for stereographic mapping is adapted from :footcite:`SteographicProjWiki`:
 
 .. math::
    \theta &= \frac{\pi}{2} - \arctan\left(\frac{r}{z-z_m}\right)\\
@@ -111,33 +113,32 @@ The following formulation is adapted from :footcite:`SteographicProjWiki`:
 The projected coordinates are given by:
 
 .. math::
-   x_p &= -r \cdot  \text{sgn}(R) \cos(\phi)\\
-   y_p &= -r \cdot \text{sgn}(R) \sin(\phi)\\
+   x_p &= -r \, \text{sgn}(R) \cos(\phi)\\
+   y_p &= -r \, \text{sgn}(R) \sin(\phi)\\
    :label: stereographic_proj_eq
 
 **Equal-Area**
 
-This equation, adapted from :footcite:`EqualAreaProjWiki`, is as follows:
+The equation for an equal-area-projection, adapted from :footcite:`EqualAreaProjWiki`, is:
 
 .. math::
-   x_r = \frac{x - x_0} {\lvert R \rvert}\\
-   y_r = \frac{y - y_0} {\lvert R \rvert}\\
-   z_r = \frac{z - z_m} {R}\\
+   x_r &= \frac{x - x_0} {\lvert R \rvert}\\
+   y_r &= \frac{y - y_0} {\lvert R \rvert}\\
+   z_r &= \frac{z - z_m} {R}\\
    :label: equal_area_proj_pars
 
 The projected coordinates are given by:
 
 .. math::
-   x_p = \sqrt{\frac{2}{1-z_r} x_r}\\
-   y_p = \sqrt{\frac{2}{1-z_r} y_r}\\
+   x_p &= \sqrt{\frac{2}{1-z_r} x_r}\\
+   y_p &= \sqrt{\frac{2}{1-z_r} y_r}\\
    :label: equal_area_proj_eq
 
 
 Spectrum Rendering
 ====================
 
-Spectrum rendering operates in a similar way to image rendering. 
-Ray intersections are computed, and only rays that successfully intersect are selected for rendering into a histogram. 
+For spectrum rendering all weights of intersecting rays are not summed locally, but spectrally.
 Unlike a conventional image, this process generates a spectral histogram within a specified wavelength range, 
 derived from the wavelengths and powers of the rays.
 
@@ -152,10 +153,11 @@ The number of bins for the histogram is determined by the equation:
 
 This formula ensures that :math:`N_\text{b}` is odd, thereby providing a well-defined center. 
 Regardless of the number of rays :math:`N`, the minimum number of bins is fixed at 51, 
-with the count scaling according to the square root of :math:`N` beyond a certain threshold.
+with the count scaling according to the square root of :math:`N` above a certain threshold.
 This scaling is necessary because the Signal-to-Noise Ratio (SNR) of the mean increases proportionally 
 with :math:`\sqrt{N}` in the presence of normally distributed noise. 
-Consequently, the number of bins is adjusted to maintain a consistent SNR while enhancing the spectrum's resolution.
+Consequently, the number of bins is adjusted to maintain a consistent SNR
+while gradually enhancing the spectrum's resolution.
 
 Spectrum Color
 =================
@@ -169,7 +171,9 @@ can be calculated using the following integrals:
    Z &=\int_{\lambda} S(\lambda) z(\lambda) ~d \lambda
    :label: XYZ_Calc_Spectrum
 
-Subsequent to this calculation, typical color model conversions can be carried out.
+Subsequent to this calculation, typical color model conversions are carried out.
+This color calculation is used in the GUI to color the emitting area of a source 
+or a filter (with :math:`S \rightarrow T`).
 
 ------------
 

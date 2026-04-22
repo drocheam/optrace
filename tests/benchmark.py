@@ -78,10 +78,10 @@ for i, no_pol in enumerate([False, True]):
     print(f"\nRun {i+1}: " + ("With Polarization Handling" if not no_pol else "Without Polarization Handling"))
 
     # trace
-    time0 = time.time()
+    time0 = time.perf_counter()
     RT.no_pol = no_pol
     RT.trace(N)
-    time1 = time.time()
+    time1 = time.perf_counter()
 
     print(f"Performance (seconds / surf / million rays):  {(time1-time0)/snum/N*1e6:.3f}")
 

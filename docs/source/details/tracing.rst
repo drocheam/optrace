@@ -65,7 +65,7 @@ and :footcite:`Greve_2006`:
 
 In the event of total internal reflection (TIR), the root argument becomes negative. 
 In optrace, TIR rays are absorbed since reflections are not modeled within the system. 
-When this occurs, the user receives a message to the standard output.
+When this occurs, the user receives a message in the terminal.
 
 .. _tracing_pol:
 
@@ -114,7 +114,7 @@ Given that all vectors mentioned are unity vectors, we can perform the following
     \end{align}
     :label: pol_E
 
-Since :math:`||E_\text{p}|| = ||E_\text{s}|| = ||E|| = 1`, the amplitude components are then:
+Since :math:`\|E_\text{p}\| = \|E_\text{s}\| = \|E\| = 1`, the amplitude components are then:
 
 .. math::
    \begin{align}
@@ -128,6 +128,9 @@ For the new polarization unity vector, which also composed of two components, we
 .. math::
    E' = A_\text{ps} E_\text{s} + A_\text{tp} E_\text{p}'
    :label: pol_E2
+
+Or put differently, the new polarization is created by rotating the vector component :math:`E_\text{p}` 
+around :math:`E_\text{s}` so it is perpendicular to :math:`s'`.
 
 Transmission
 ====================
@@ -152,8 +155,11 @@ The following equations illustrate this behavior, as detailed in :footcite:`Fres
 
 The polarization components :math:`A_\text{ts}` and :math:`A_\text{tp}` are obtained 
 from equations :math:numref:`pol_A`. 
-The cosine terms involved are calculated using the direction and normal vectors as follows: 
-:math:`\cos \varepsilon = n \cdot s` and :math:`\cos \varepsilon' = n \cdot s'`.
+The cosine terms involved are calculated as follows: 
+
+.. math::
+   \cos \varepsilon &= n \cdot s\\
+   \cos \varepsilon' &= n \cdot s'
 
 For light that hits the surface perpendicularly, this results in an expression that is independent of polarization, 
 as noted in :footcite:`Kaschke2014`:
@@ -186,7 +192,7 @@ This is illustrated in :numref:`image_ideal_refraction`.
 **Cartesian Representation**
 
 Calculating positions :math:`x_f` and :math:`y_f` is straightforward 
-by evaluating the linear ray equations :math:`x(z)` and :math:`y(z)` at :math:`z=f`.
+through evaluating the linear ray equations :math:`x(z)` and :math:`y(z)` at :math:`z=f`.
 
 For :math:`x_f`, we have:
 
@@ -203,13 +209,13 @@ Similarly, for :math:`y_f`:
 It is important to note that :math:`s_{0z} = 0` is prohibited, 
 as all rays are required to have a positive z-direction component.
 
-With the point :math:`P_f` known, the outgoing propagation vector :math:`s_0'` can be calculated as follows:
+With the point :math:`P_f` calculated, the outgoing propagation vector :math:`s_0'` is:
 
 .. math::
    s_0' = P_f - P = \begin{pmatrix} \frac{s_{0x}}{s_{0z}}f - x_0 \\ \frac{s_{0y}}{s_{0z}}f - y_0 \\ f \end{pmatrix}
    :label: refraction_ideal_s0
 
-Normalizing this vector gives us:
+Normalizing this vector results in:
 
 .. math::
    s' = \frac{s_0'}{||s_0'||}
@@ -223,7 +229,7 @@ Consider the x-component of the propagation vector:
 .. math::
    s_{0x}' = \frac{s_{0x}}{s_{0z}}f - x_0
 
-Dividing it by :math:`f` yields:
+Division by :math:`f` yields:
 
 .. math::
    \frac{s_{0x}'}{f} = \frac{s_{0x}}{s_{0z}} - \frac{x_0}{f}
@@ -234,51 +240,38 @@ and :math:`\tan \varepsilon_x = \frac{s_{0x}}{s_{0z}}`. Therefore, we have:
 .. math::
    \tan \varepsilon_x' = \tan \varepsilon_x - \frac{x_0}{f}
 
-Analogously, in the y-direction, we obtain:
+Analogously, in the y-direction, the result is as follows:
 
 .. math::
    \tan \varepsilon_y' = \tan \varepsilon_y - \frac{y_0}{f}
 
-This angular representation is a formulation also found in :footcite:`BRULS2015659`.
+This angular representation is also found in :footcite:`BRULS2015659`.
 
 
 Filtering
 ==================
 
-When passing through a filter, a ray with power :math:`P_i` and wavelength :math:`\lambda_i` 
-is attenuated according to the filter's transmission function :math:`T_\text{F}(\lambda)`:
-
-.. math::
-   P_{i+1} = 
-   \begin{cases}
-        P_{i}~ T_\text{F}(\lambda_i) & \text{for}~~ T_\text{F}(\lambda_i) > T_\text{th}\\
-        0  & \text{else}\\
-   \end{cases}
-   :label: eq_filtering
-
-Additionally, ray powers are set to zero if the transmission falls below a specific threshold :math:`T_\text{th}`. 
-This approach avoids *ghost rays* that continue to be propagated during raytracing but carry very little power. 
-As their contribution to image formation is negligible, absorbing them as soon as possible
-helps accelerate the tracing process.
-
-As a side note, apertures are also implemented as filters, but with :math:`T_\text{F}(\lambda) = 0` for all wavelengths.
+A ray with power :math:`P_i` and wavelength :math:`\lambda_i` passing through a filter
+is attenuated according to the filter's transmission function :math:`T_\text{F}(\lambda)`.
+Apertures are also implemented as filters, but with :math:`T_\text{F}(\lambda) = 0` for all wavelengths.
 
 Geometry Checks
 ==========================
 
 Geometry checks before tracing include:
 
-* All tracing-relevant elements must be within the outline.
-* There must be no object collisions.
-* Elements must follow a defined, sequential order.
-* Ray sources must be available.
-* All ray sources must precede all other types of elements.
+* all tracing-relevant elements must be within the outline.
+* there can't be any object collisions.
+* elements must follow a defined, sequential order.
+* there are ray sources in the scene.
+* all ray sources must precede all other types of elements.
 
-Collision checks are performed by first sorting the elements and then comparing positions on adjacent surfaces. 
+Collision checks are performed by first sorting the elements for their order along the optical axis 
+and then comparing positions on adjacent surfaces. 
 This is implemented by randomly sampling many lateral surface positions 
 and checking the correct order of the axial coordinates.
 While this method doesn't guarantee the absence of collisions, 
-the sequentiality is verified for each ray during raytracing, and warnings are emitted if issues are detected.
+the sequentiality is verified for each ray during raytracing, and warnings are emitted if any issues are detected.
 
 
 Intersection Calculation
@@ -291,8 +284,8 @@ To simplify the handling of non-intersecting rays and ensure each ray has the sa
 the surface is extended so that all rays intersect a surface. 
 Gaps on the surface are filled, and the surface edge is extended radially towards infinity. 
 
-An intersection is calculated for the extended surface. 
-The ray is marked as hitting or non-hitting based on a surface mask afterward.
+An intersection is calculated for this extended surface. 
+The ray is marked as hitting or non-hitting based on a surface mask afterwards.
 
 .. figure:: ../images/surface_extension.svg
    :width: 900
@@ -324,7 +317,7 @@ The surface point normal equation is:
 The ray equation in dependence of ray parameter :math:`t` is as follows:
 
 .. math::
-   \vec{p} = \vec{p_0} + \vec{s} \cdot t
+   \vec{p} = \vec{p_0} + \vec{s} \, t
    :label: line_equation_common
 
 Inserting these equations into each other results in:
@@ -342,8 +335,8 @@ for the case where :math:`\vec{s} \cdot \vec{n} \neq 0`:
 
 This result can be inserted into the ray equation to determine the intersection position.
 If :math:`\vec{s} \cdot \vec{n} = 0`, the surface normal and ray direction vector are perpendicular. 
-If the ray lies in the plane, there are infinite solutions.
-If not, there is none.
+If the ray lies inside the plane, there are infinitely many solutions.
+If it lies outside, there are none.
 
 Intersection of a Ray with a Conic Surface
 --------------------------------------------
@@ -425,10 +418,11 @@ In the second case, the ray lies within the plane, resulting in infinite interse
 In the third case, the ray is parallel but offset from the plane, producing no intersections. 
 We enforce :math:`s_z > 0` in our simulator, making only the first case relevant.
 
-For :math:`\rho \rightarrow \infty` and :math:`r \in \mathbb{R}`, the conic section becomes a cone for :math:`k < -1`, 
-a line from :math:`z = z_0` to :math:`z \rightarrow \infty` for :math:`k = -1`, 
-or a point at :math:`(x_0, y_0, z_0)` for :math:`k > -1`. 
-In the first two cases, the conic sections consist of long linear segments. 
+For :math:`\rho \rightarrow \infty` and :math:`r \in \mathbb{R}`, the conic section becomes:
+(1) a cone for :math:`k < -1`, 
+(2) a line from :math:`z = z_0` to :math:`z \rightarrow \infty` for :math:`k = -1`, 
+or (3) a point at :math:`(x_0, y_0, z_0)` for :math:`k > -1`. 
+In the first two cases, the conic sections consist of long segments without any curvature. 
 Depending on the cases of equation :math:numref:`IntersectionAsphere5`, a ray can intersect once, twice, 
 not hit the surface or lie within it. 
 For a point (:math:`k > -1`), there can be no intersection or a single one. 
@@ -453,7 +447,7 @@ Therefore, the solution must be approximated numerically and iteratively.
 The ray line equation, depending on the ray parameter :math:`t`, is defined as follows:
 
 .. math::
-   \vec{p_t}(t)=\vec{p}_{0}+t \cdot \vec{s}
+   \vec{p_t}(t)=\vec{p}_{0}+t \, \vec{s}
    :label: pt
 
 The cost function :math:`G` in relation to the surface function :math:`f` is expressed by:
@@ -464,7 +458,8 @@ The cost function :math:`G` in relation to the surface function :math:`f` is exp
 
 The parameters :math:`x_t, y_t, z_t` are derived from equation :math:numref:`pt`. 
 To determine the position of the intersection, the root of the scalar function :math:`G` must be identified. 
-Suitable for this task are typical optimization algorithms. However, these algorithms often lack guaranteed convergence. 
+Methods suitable for this task are typical optimization algorithms. 
+However, these algorithms often lack guaranteed convergence. 
 
 To address this issue, the raytracer employs the Regula-Falsi method. 
 This method is a straightforward iterative approach that guarantees superlinear convergence 
@@ -492,7 +487,7 @@ Surface normals are required to calculate the refraction, polarization, and tran
 The equation for an analytical, unnormalized normal vector is presented below, as detailed in :footcite:`NormalWiki`.
 
 .. math::
-   \vec{n} = 
+   \vec{n}_0 = 
    \begin{pmatrix}
         -\frac{\partial z}{\partial x}\\
         -\frac{\partial z}{\partial y}\\
@@ -500,10 +495,10 @@ The equation for an analytical, unnormalized normal vector is presented below, a
    \end{pmatrix}
    :label: normal_general
 
-To use this vector for calculations, it must be normalized:
+The normalized vector is:
 
 .. math::
-   \vec{n}_0 = \frac{\vec{n}}{|| \vec{n} ||}
+   \vec{n} = \frac{\vec{n}_0}{\| \vec{n}_0 \|}
    :label: normal_numerical_norm
 
 
@@ -521,8 +516,8 @@ Asphere
 The radial derivative of an asphere equation is given by:
 
 .. math::
-   m_r = \frac{\partial z}{\partial r} = \frac{\rho r}{\sqrt{1 - (k+1)\rho^2 r^2}} 
-        + \sum_{i=1}^{m}  2i \cdot  a_i \cdot r^{2i - 1} = \tan \alpha
+   m_r = \tan \alpha = \frac{\partial z}{\partial r} = \frac{\rho r}{\sqrt{1 - (k+1)\rho^2 r^2}} 
+        + \sum_{i=1}^{m}  2i \,  a_i \, r^{2i - 1}
    :label: asphere_deriv
 
 This radial component must be rotated around the vector :math:`(0, 0, 1)` by the angle :math:`\phi`. 
@@ -582,13 +577,13 @@ FunctionSurface
 --------------------
 
 For the surface types **FunctionSurface1D** and **FunctionSurface2D**, 
-the derivatives required for constructing the normal vector are typically calculated numerically. 
-An exception to this arises when a derivative function is directly provided to the object.
+the derivatives required for constructing the normal vector are calculated numerically. 
+An exception to this arises when a derivative function is directly provided as parameter.
 
 The central first derivative has the form:
 
 .. math::
-   f'(x) = \frac{f(x+\varepsilon) - f(x-\varepsilon)}{2 \varepsilon}
+   f'(x) \approx \frac{f(x+\varepsilon) - f(x-\varepsilon)}{2 \varepsilon}
    :label: central_first_deric
 
 For partial surface derivatives, the expressions are approximately given by:
@@ -597,12 +592,13 @@ For partial surface derivatives, the expressions are approximately given by:
     \frac{\partial z}{\partial x} &\approx \frac{z(x + \varepsilon, ~y) - z(x - \varepsilon, ~y)}{2\varepsilon}\\
     \frac{\partial z}{\partial y} &\approx \frac{z(x, ~y + \varepsilon) - z(x, ~y - \varepsilon)}{2\varepsilon}\\
 
-For a **FunctionSurface1D**, both derivatives are the same due to symmetry, so only a single value needs to be computed. 
+For a radially-symmetric **FunctionSurface1D** a radial derivative is calculated, 
+which is decomposed into x- and y-components.
 The step width :math:`\varepsilon` is selected as the maximum of the optimal step width :math:`\varepsilon_\text{o}`
 and the minimal positional step width :math:`\varepsilon_\text{p}`:
 
 .. math::
-   \varepsilon = \max (\varepsilon_\text{o}, ~\varepsilon_\text{n})
+   \varepsilon = \max (\varepsilon_\text{o}, ~\varepsilon_\text{p})
    :label: eps_selection
 
 The optimal step width, as derived from :footcite:`DiffIntMorken`, is given by:
@@ -611,7 +607,7 @@ The optimal step width, as derived from :footcite:`DiffIntMorken`, is given by:
    \varepsilon_\text{o} = \sqrt[3]{3 \varepsilon_\text{f} \left| \frac{f(x)}{f^{(3)}(x)} \right|} 
    :label: optimal_step_width
 
-Here, :math:`\varepsilon_\text{f}` represents the machine precision for the floating-point type being utilized. 
+Here, :math:`\varepsilon_\text{f}` represents the machine precision for the floating-point type in use. 
 Under the assumption of predominantly spherical surfaces, the primary function component is :math:`x^2`. 
 Higher polynomial orders are less significant, a reasonable assumption 
 is :math:`\left| \frac{f(x)}{f^{(3)}(x)} \right| = 50`. 

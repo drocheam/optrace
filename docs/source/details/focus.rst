@@ -30,8 +30,7 @@ RMS Spot Size
 
 An analytical solution exists for the RMS spot size method. 
 The following derivation closely follows :footcite:`Boussemaere_2023_19`.
-For ray sections that start at the coordinates :math:`x_i, y_i, z_0`, 
-their positions at an additional axial distance :math:`t` are given by:
+For a ray section starting at :math:`x_i, y_i, z_0` the position at additional axial distance :math:`t` is given by:
 
 .. math::
    x_i^*&=x_i+\frac{s_{x, i}}{s_{z, i}} t \\
@@ -39,8 +38,9 @@ their positions at an additional axial distance :math:`t` are given by:
    :label: eq_rms_spot_size_propagation
 
 We can define the RMS spot size relative to the center coordinates :math:`x_c^*, y_c^*`. 
-This average position also propagates, originating from :math:`x_c, y_c` and possessing a direction vector :math:`s_c`.
-The cost function is:
+This average position also propagates along the optical axis, 
+originating from :math:`x_c, y_c` and with direction vector :math:`s_c`.
+Next, the cost function is defined as:
 
 .. math::
    R_v(d) &=\sqrt{\frac{1}{N} \sum_{i=1}^N\left(\left(x_i^*-x_c^*\right)^2+\left(y_i^*-y_c^*\right)^2\right)} \\
@@ -61,15 +61,16 @@ and the relative direction :math:`\Delta \theta_{x,i}, \Delta \theta_{y,i}`:
 Applying variational calculus results in :footcite:`Boussemaere_2023_19`:
 
 .. math::
-   t = -\frac{\sum_{i=1}^N \left(\Delta \theta_{x, i} \Delta x_i+\Delta \theta_{y, i} \Delta y_i \right)}
+   t_\text{RMS} = -\frac{\sum_{i=1}^N \left(\Delta \theta_{x, i} \Delta x_i+\Delta \theta_{y, i} \Delta y_i \right)}
    {\sum_{i=1}^N \left(\Delta \theta_{x, i}^2+\Delta \theta_{y, i}^2 \right)}
    :label: eq_rms_spot_size_solution
 
-Thus, the focal position is located at :math:`z_0 + t`.
+Thus, the focal position is located at :math:`z_0 + t_\text{RMS}`.
 
 **Ray Weighted RMS**
 
-It is possible to include additional weights :math:`w_i` for each ray, which can represent attributes such as ray power.
+Additional weights :math:`w_i` can be attributed to each ray.
+By choosing the ray power as weights, the power-weighted RMS spot size is obtained:
 
 .. math::
    R_v(d) =\sqrt{\frac{1}{N} \sum_{i=1}^N\left(\left(w_i\left(x_i^*-x_c^*\right)\right)^2
@@ -87,10 +88,9 @@ resulting in a factor of :math:`w_i^2` for all terms. This yields a solution of:
 **Position Weighted RMS**
 
 Utilizing other strictly monotonically increasing functions that depend on 
-:math:`r^2 = \left(x_i^* - x_c^*\right)^2 + \left(y_i^* - y_c^*\right)^2` does not yield additional benefits. 
-These functions all share the same position for the minimum 
-but might present numerical challenges or be more complex to compute.
-Due to its simplicity and convexity optimizing just :math:`r^2` should be preferred.
+:math:`r^2 = \left(x_i^* - x_c^*\right)^2 + \left(y_i^* - y_c^*\right)^2` does not yield any additional benefits. 
+These functions all share the same minimum position.
+Optimizing the least-squares cost :math:`r^2` should be preferred due to its simplicity and convexity.
 
 
 Optimization Methods
@@ -99,30 +99,33 @@ Optimization Methods
 The :func:`scipy.optimize.minimize` function, along with its optimization methods, 
 is utilized under the hood for various optimization tasks. 
 
-For the Irradiance Variance method, the :external:ref:`Nelder-Mead <optimize.minimize-neldermead>` 
-solver is employed directly. This choice is based on the observation that the cost function is typically 
-smooth and straightforward to minimize in most situations.
+For the *Irradiance Variance* method, the :external:ref:`Nelder-Mead <optimize.minimize-neldermead>` 
+solver is employed directly, without doing additional search iterations or refinements. 
+This choice is motivated on the observation of a typically smooth cost function.
 
-In contrast, for the methods Image Sharpness and Image Center Sharpness, 
+In contrast, for the methods *Image Sharpness* and *Image Center Sharpness*, 
 the cost function tends to be much noisier and may include numerous local minima. 
 To address this challenge, the search region is initially sampled at multiple points. 
-Subsequently, minimization is initiated relative to the smallest found cost. 
-The :external:ref:`COBYLA <optimize.minimize-cobyla>` solver yields good results in these cases.
+Subsequently, minimization is initiated relative to the smallest found cost position.
+The :external:ref:`COBYLA <optimize.minimize-cobyla>` solver yields satisfactory results in these cases.
 
 Pixel Dimensions for Rendering Methods
 ==================================================
 
-Methods such as Irradiance Variance, Image Sharpness, and Image Center Sharpness render multiple images
-denoted as :math:`P_z`, each with a pixel count of :math:`N_\text{px} \cdot N_\text{px}`.
+Methods such as *Irradiance Variance*, *Image Sharpness*, and *Image Center Sharpness* render multiple images
+denoted as :math:`P_z`, each with a pixel count of :math:`N_\text{px} \, N_\text{px}`.
 
-The side length in pixels, :math:`N_\text{px}`, is influenced by the number of rays used for focus determination. 
+The side length in pixels, :math:`N_\text{px}`, is influenced by the number of rays used for focus search. 
 When working with a small number of rays, it is advantageous to keep :math:`N_\text{px}` low to minimize noise effects. 
 Conversely, as the number of rays increases, :math:`N_\text{px}` can be gradually increased to resolve finer details. 
 Distributing :math:`N` rays over a square area necessitates increasing :math:`N_\text{px}` 
 proportionally to :math:`\sqrt{N}` to maintain a relatively consistent Signal-to-Noise Ratio (SNR). 
-The implemented formula follows the form :math:`N_\text{px} = \text{offset} + \text{factor} \cdot \sqrt{N}`.
+The implemented formula follows the form 
 
-For simplicity, the same pixel count is used for both image dimensions.
+.. math::
+   N_\text{px} = \text{offset} + \text{factor} \, \sqrt{N}
+
+For simplicity, both image dimensions share the same pixel dimensions.
 
 ------------
 
