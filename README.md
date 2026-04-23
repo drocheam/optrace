@@ -90,6 +90,8 @@ This project is not affiliated with a package of the same name on PyPI.
 ## Contributing
 
 If you encounter any bugs, have feature requests, or want to suggest improvements, please open an issue or pull request.
+More details can be found in the [CONTRIBUTING](./CONTRIBUTING.md) file.
+
 Documentation on testing, packaging 
 and other technical details is located [here](https://drocheam.github.io/optrace/development/index.html).
 
