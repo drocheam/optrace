@@ -42,7 +42,7 @@ This project is not affiliated with a package of the same name on PyPI.
      - License
    * - `chardet <https://chardet.readthedocs.io/en/latest/>`_
      - automatic detection of file encoding
-     - LGPLv2.1
+     - 0BSD
    * - `matplotlib <https://matplotlib.org/stable/users/index>`_
      - 2D plotting library
      - PSF

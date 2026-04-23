@@ -32,30 +32,33 @@ in the journal *Translational Vision Science & Technology*
 
 
  **Features**
-  * Sequential raytracing for geometrical optics
+  * Sequential Monte-Carlo raytracing for geometrical optics
+  * Rendering of RGB detector images, including dispersion and filter effects of the optical setup
+  * Functions for paraxial analysis (matrix optics, cardinal points/planes and PSF convolution)
+  * Includes various presets and user-definable surface shapes, ray sources, and media
+  * Import of basic `.zmx` ZEMAX geometries (surfaces, media, positions)
+  * Optional edge diffraction approximation with [Heisenberg uncertainty ray bending](https://drocheam.github.io/optrace/details/hurb.html)
+  * Optional GUI with an interactive 3D scene viewer
   * Free and open source software
   * Programming/scripting approach to optics simulation
-  * Rendering of colored detector images
-  * Paraxial analysis (matrix optics, cardinal points/planes and PSF convolution)
-  * Includes presets and user-definable surface shapes, ray sources, and media
-  * Optional GUI with an interactive 3D scene viewer
   * Automation capabilities
   * High performance of 85 ms / surface / million rays 
     ([details](https://drocheam.github.io/optrace/development/testing.html#benchmark-testing))
   * Comprehensive documentation
 
  **Limitations**
-  * Coding-free simulations are not supported
+  * Coding-free simulations ("GUI only") are not supported
   * Wave optics effects such as diffraction and interference are not included
   * No non-sequential raytracing for simulating ghost images and reflections
   * Mirror or Fresnel lens optics are not supported
-  * No modelling of scattering effects or polarization-dependent media
+  * No modelling of scattering effects, gradient index materials, or birefringent media
   * No functionality for lens optimization, aberration analysis, and tolerancing
  
  **Purpose/Use Cases**
   * Educational purposes, demonstrating aberrations or simple optical setups
   * Introductory tool to paraxial, geometrical optics or image formation
   * Simulation of simpler systems: Prism, eye model, telescope, ...
+  * Realistic color image rendering in imaging setups
   * Estimation of effects where professional software (ZEMAX, OSLO, Quadoa, ...) is overkill for
 
 ## Documentation
@@ -97,17 +100,20 @@ This project is published under the [MIT License](https://github.com/drocheam/op
 ## Similar software
 
 - Geometrical Optics
+   * [RayTracing](https://github.com/DCC-Lab/RayTracing) by DCC-Lab. Paraxial raytracer with beam path visualization.
    * [RayOptics](https://ray-optics.readthedocs.io/en/latest/) by Michael Hayford. Tracing and optical design analysis tool. 
    * [rayopt](https://github.com/quartiq/rayopt) by QUARTIQ. Tracing and optical design analysis tool. 
-   * [RayTracing](https://github.com/DCC-Lab/RayTracing) by DCC-Lab. Paraxial raytracer with beampath visualization.
-   * [Optiland](https://optiland.readthedocs.io/en/latest/index.html) by Harrison Kramer. Optical design and analysis framework.
+   * [tracepy](https://github.com/TracePy-Org/tracepy) by Gavin Niendorf. Simple raytracing tool with optimization features.
+   * [Optiland](https://optiland.readthedocs.io/en/latest/index.html) by Harrison Kramer. Comprehensive optical design and analysis framework with a 3D viewer.
 
 - Wave Optics
    * [diffractsim](https://github.com/rafael-fuente/diffractsim) by Rafael de la Fuente. Wave optics simulation of arbitrary apertures and phase holograms.
    * [poppy](https://github.com/spacetelescope/poppy) by Space Telescope Science Institute. Fraunhofer and Fresnel propagation for optics.
-   * [prysm](https://prysm.readthedocs.io/en/stable/index.html) by Brandon Dube. Interferometer and diffraction calculations.
+   * [prysm](https://prysm.readthedocs.io/en/stable/index.html) by Brandon Dube. Interferometer and diffraction simulations.
 
 - Geometrical + Wave Optics
    * [opticspy](https://github.com/Sterncat/opticspy) by Xing Fan. Tracing, wave optics, aberration and Zernike polynomial analysis.
-   * [raypier](https://raypier-optics.readthedocs.io/en/latest/introduction.html#the-components-of-a-raypier-model) by Bryan Cole. Raytracing and beamlet propagation with 3D viewer.
+   * [raypier](https://raypier-optics.readthedocs.io) by Bryan Cole. Raytracing and beamlet propagation with a 3D viewer.
+   * [PAOS](https://paos.readthedocs.io/en/latest/index.html) by Andrea Bocchieria, Lorenzo V. Mugnaia, and Enzo Pascale. Paraxial raytracing and Fresnel approximation wave propagation.
+
 
