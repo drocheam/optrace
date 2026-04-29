@@ -174,7 +174,8 @@ ________________________
 Documentation website tests are done with the 
 `website_test.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/website_test.yml>` 
 workflow that runs the 
-`tests/test_website.sh <https://github.com/drocheam/optrace/blob/main/tests/test_website.sh>`__ bash script.
+`tests/test_website.sh <https://github.com/drocheam/optrace/blob/main/tests/test_website.sh>`__ and
+`tests/test_connections.sh <https://github.com/drocheam/optrace/blob/main/tests/test_connections.sh>`__ bash scripts.
 The test checks that the site is reachable, includes most important parts (index, impressum, robots, sitemap), 
 does not set cookies and does not load any external resources.
 The two last points are required for the best privacy and GDPR compliance.

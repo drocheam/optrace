@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# check connected domains
+# For privacy and compliance, we don't want any external resources or connections
+
 connections=$(node ./tests/audit_connections.js)
 count=$(echo "$connections" | wc -l)
 
@@ -9,4 +12,5 @@ if [ "$count" -ne 1 ]; then
   exit 1
 fi
 
+printf 'Connections:\n%s\n' "$connections"
 exit 0
