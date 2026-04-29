@@ -25,10 +25,11 @@ ________________
 
 **Overview**
 
-The |Raytracer| class provides the functionality for tracing, geometry checking, rendering spectra and images, 
-and focusing.
+The |Raytracer| class provides the functionality for tracing, geometry checks, focus search, 
+and rendering spectra and images. 
 
-Since the |Raytracer| is a subclass of a |Group|, elements can be changed or added in the same way.
+Since the |Raytracer| is a subclass of a |Group|, 
+elements can be changed or added in the same way as described in :numref:`group`. 
 
 
 .. figure:: ../images/example_legrand1.png
@@ -36,39 +37,42 @@ Since the |Raytracer| is a subclass of a |Group|, elements can be changed or add
    :align: center
    :class: dark-light
 
-   Example of a raytracer geometry in the TraceGUI in side view
+   Example of a raytracer geometry as side view in the TraceGUI.
 
 
 **Outline**
 
-All objects and rays can only exist in a three-dimensional box, the *outline*.
-When initializing the |Raytracer| it is passed as :python:`outline` parameter.
+All objects and rays only exist in a three-dimensional box, the *outline*.
+It is a required parameter when initializing the |Raytracer|:
 
 .. testcode::
 
    RT = ot.Raytracer(outline=[-2, 2, -3, 3, -5, 60])
 
+The :python:`outline` is provided as six element list with positions :math:`[x_0, x_1, y_0, y_1, z_0, z_1]` 
+defining the outer boundaries.
 
 **Geometry**
 
-Since optrace implements sequential raytracing, the surfaces and objects must be in a well-defined and unique sequence. 
-This applies to all elements with interactions of light: :python:`Lens, IdealLens, Filter, Aperture, RaySource`.
+As optrace implements sequential raytracing, all surfaces and objects must be in a well-defined 
+and unique chronological sequence along the optical axis. 
+This applies to all elements with interactions of light (:python:`Lens, IdealLens, Filter, Aperture, RaySource`).
 The elements :python:`Detector, LineMarker, PointMarker, BoxVolume, SphereVolume, CylinderVolume` 
-are excluded from this. All ray source elements must lie before all lenses, filters and apertures. 
-And all subsequent lenses, filters, apertures must not collide with each other and be inside the outline.
+are excluded from this. All ray source elements must lie prior to any lenses, filters and apertures. 
+All subsequent lenses, filters, and apertures must not collide with each other and must be inside the outline.
 
-Rays that hit the outline box will be absorbed.
+Rays hitting the outline box are absorbed in any case.
 
 **Surrounding Media**
 
-In :ref:`usage_lens` we learned that when creating a lens, the :python:`n2` parameter defines the subsequent medium. 
+In :numref:`usage_lens` we learned that when creating a lens, the :python:`n2` parameter defines the subsequent medium. 
 In the case of multiple lenses, the :python:`n2` of the previous lens is the medium prior to the next lens.
-In the case of the raytracer, we can define an :python:`n0` which defines the refractive index for all 
-undefined :python:`n2=None`, as well as for the region to the first lens.
+For the raytracer, we can define an :python:`n0` which defines the refractive index for all 
+unspecified :python:`n2` media, as well as for the region in front of the first lens.
 
 The following figure shows a setup with lenses :python:`L0, L2` having a :python:`n2` defined and a custom 
 :python:`n0` parameter in the raytracer class. The medium before the first lens as well as the medium 
-behind :python:`L1` are therefore also :python:`n0`.
+behind :python:`L1` are therefore set to :python:`n0`.
 
 .. figure:: ../images/rt_setup_different_ambient_media.svg
    :width: 760
@@ -80,23 +84,23 @@ behind :python:`L1` are therefore also :python:`n0`.
 
 **Absorbing Rays**
 
-optrace ensures that rays not intersecting both lens surfaces get absorbed.
+optrace ensures that rays not intersecting both lens surfaces are absorbed.
 
-Generally, these rays are error cases.
+Generally, these rays are seen as error cases.
 A ray only hitting one surfaces must enter/leave through the lens side cylinder, 
 that is not handled in our sequential simulation.
 Rays not hitting the lens at all are typically undesired. 
-In real optical systems they would be (hopefully) absorbed by the housing of the system.
+In real optical systems they would be absorbed by the housing of the system.
 
 **Parameter** :attr:`no_pol <optrace.tracer.raytracer.Raytracer.no_pol>`
 
-The raytracer provides the functionality to trace polarization directions. Thus, not only the polarization vector 
-for the ray and ray segment can be calculated, but also the exact transmission at each surface transition.
-Unfortunately, the calculation is comparatively computationally intensive.
+The raytracer provides the functionality to trace polarization directions. Doing so, not only the polarization vector 
+for the ray and ray segment is calculated, but also the exact transmission at each surface transition.
+Unfortunately, these calculations are comparatively computationally intensive.
 
-With the parameter :python:`no_pol=True` no polarizations are calculated and a unpolarized/uniformly polarized light 
+With the parameter :python:`no_pol=True` no polarizations are calculated and an unpolarized/uniformly polarized light 
 is assumed everywhere. Typically this speeds up the tracing by 10-30%.
-Whether you can neglect the influence of polarization depends on the exact setup of the geometry.
+Whether the influence of polarization can be neglected depends on the exact optical setup and application.
 
 
 Tracing
@@ -104,7 +108,7 @@ _____________________
 
 **Tracing the system**
 
-Tracing is with the :meth:`Raytracer.trace() <optrace.tracer.raytracer.Raytracer.trace>` 
+Run the tracing with the :meth:`Raytracer.trace() <optrace.tracer.raytracer.Raytracer.trace>` 
 method of the |Raytracer| class.
 It takes the number of rays :python:`N` as parameter.
 The method uses the current tracing geometry and stores the ray properties 
@@ -112,8 +116,8 @@ internally in a :class:`RayStorage <optrace.tracer.ray_storage.RayStorage>` obje
 
 **Example**
 
-Below you can find an example. A eye preset is loaded and flipped around the x-axis.
-A point source is added at the retina and the geometry is traced.
+Below you can find an example. An eye preset is loaded and flipped around the x-axis.
+A point source is added near the retina and the geometry is traced.
 
 .. testcode::
 
@@ -154,15 +158,15 @@ Described in :numref:`rimage_rendering`.
 
 **Tracing with many rays**
 
-The number of rays is limited by the RAM usage.
-The RAM usage is by default limited by the 
+The number of rays is limited by their RAM usage.
+By default, the maximum RAM usage is set by the 
 :attr:`Raytracer.MAX_RAY_STORAGE_RAM <optrace.tracer.raytracer.Raytracer.MAX_RAY_STORAGE_RAM>` parameter, 
-the actual number of rays results from the complexity of the geometry.
-Its default value is 8GB, but it can be set for each |Raytracer| object separately.
+with the actual number of rays resulting from the number of surfaces in the geometry.
+Its default value is 6GB, but it can be set for each |Raytracer| separately.
 
 To generate images with even more rays, the method 
-:meth:`Raytracer.iterative_render <optrace.tracer.raytracer.Raytracer.iterative_render>` can be applied, 
-which traces the geometry iteratively without holding all rays in memory. 
+:meth:`Raytracer.iterative_render <optrace.tracer.raytracer.Raytracer.iterative_render>` is employed, 
+which traces the geometry iteratively without holding the rays of every prior iteration in memory. 
 More details are available in :numref:`rimage_iterative_render`.
 
 
@@ -173,15 +177,14 @@ ________________________
 
 **Image Blurring**
 
-Image blurring can be applied to rendered images to account for resolution limits.
-This process utilizes an Airy disk filter, as detailed in :numref:`image_airy_filter`, 
-to approximate the blurring effect. 
-It is important to note that this method provides a very generalized approximation.
+Subsequent artificial image blurring can be applied to approximate the resolution limit.
+This process utilizes an Airy disk filter, as detailed in :numref:`image_airy_filter`. 
+It is important to note that this method provides a very generalized approximation, completely wrong in many cases.
 
 **Ray Bending**
 
 optrace incorporates experimental support for Heisenberg Uncertainty Ray Bending (HURB). 
-Further technical details regarding its implementation are available in :numref:`hurb_details`.
+Technical details regarding its implementation are available in :numref:`hurb_details`.
 An example for experimentation with HURB is available in :numref:`example_hurb_apertures`.
 
 The current implementation of HURB has the following limitations:
@@ -192,13 +195,15 @@ The current implementation of HURB has the following limitations:
 * Ray bending is currently limited to the inner aperture edges 
   of :class:`RingSurface <optrace.tracer.geometry.surface.ring_surface.RingSurface>`
   and :class:`SlitSurface <optrace.tracer.geometry.surface.slit_surface.SlitSurface>` types.
-* All apertures are modeled as diffracting elements.
-* The aperture stop must be explicitly defined as a surface within the optical setup.
+* All apertures are modeled as diffracting elements (even if only one would define the limiting aperture in reality).
+* The aperture stop must be explicitly defined as a surface within the optical setup. 
+  (so an edge of a lens is not automatically used as limiting aperture)
 
-Another issue is that bending leads to large angle rays.
+Another issue is that bending leads to statistically a few rays with very large angles 
+near 90 degrees relative to the input propagation.
 The use of image rendering with automatic extent is discouraged,
-as these rays lead to drastically increased automatically set sizes.
-Provide the image size manually, see :numref:`rimage_rendering`.
+as these rays lead to drastically increased automatic image sizes.
+Provide the geometric image size manually, see :numref:`rimage_rendering`.
 
 Given these restrictions and the experimental status of the feature, 
 HURB requires explicit activation. 
@@ -215,6 +220,6 @@ the :attr:`HURB_FACTOR <optrace.tracer.raytracer.Raytracer.HURB_FACTOR>` attribu
 
     RT.HURB_FACTOR = 2.3
 
-Additional information concerning this factor is provided in :numref:`hurb_uncertainty_factor`. 
+Additional information concerning this factor are provided in :numref:`hurb_uncertainty_factor`. 
 
 

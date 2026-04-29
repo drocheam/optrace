@@ -1,7 +1,7 @@
 .. _usage:
 
 ################
-User Guide
+Usage Guide
 ################
 
 .. toctree::
@@ -13,8 +13,8 @@ User Guide
    group
    raytracer
    refraction_index
-   spectrum
    image
+   spectrum
    focus
    tma
    convolve

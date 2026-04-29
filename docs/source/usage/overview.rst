@@ -34,18 +34,18 @@ ___________________
      - Links
 
    * - **Paraxial Analysis**
-     - Finding principial planes, focal points, object and image distances, exit and entrance pupil
+     - Calculating principal planes, focal points, object and image distances, exit and entrance pupil
      - :class:`optrace.TMA <optrace.tracer.transfer_matrix_analysis.TMA>`
      - :ref:`usage_tma`
 
    * - **Paraxial Imaging**
-     - Image simulation by convolution with a rendered point spread function
+     - Image simulation through convolution with a rendered point spread function
      - :func:`optrace.convolve <optrace.tracer.convolve.convolve>`
      - :ref:`usage_convolution`
 
    * - **General Geometrical Optics and Image/Spectrum Simulation**
-     - Sequential Raytracing of optical setups. Analysis of ray paths, 
-       simulation of detector images and spectra, focus finding.
+     - Sequential Monte-Carlo Raytracing of optical setups. Analysis of ray paths, 
+       simulation of detector images and spectra, focus search.
      - :class:`optrace.Raytracer <optrace.tracer.raytracer.Raytracer>`, 
        :class:`optrace.RenderImage <optrace.tracer.image.render_image.RenderImage>`, 
        :class:`optrace.LightSpectrum <optrace.tracer.spectrum.light_spectrum.LightSpectrum>`
@@ -53,7 +53,7 @@ ___________________
        :ref:`usage_spectrum`, :ref:`usage_focus`, :ref:`usage_ray_access`
 
    * - **Image, Surface, Spectrum and Refractive Index Plotting**
-     - Display images, spectra, surfaces and refractive indices graphically
+     - Display images, spectra, surfaces and refractive indices graphically in 2D plots.
      - :mod:`optrace.plots <optrace.plots>`
      - :ref:`usage_plots` 
    
@@ -64,7 +64,7 @@ ___________________
      - :ref:`usage_color`, :ref:`usage_image` 
    
    * - **Graphical Setup and Visualization**
-     - Graphical display of the tracing scene and traced rays as well as some control features for the simulation
+     - Graphical display of the 3D tracing scene and traced rays. Additional control features for the simulation.
      - :class:`optrace.TraceGUI <optrace.gui.trace_gui.TraceGUI>`
      - :ref:`usage_gui`, :ref:`gui_automation`
 
@@ -72,16 +72,15 @@ Namespaces
 ______________________
 
 :python:`optrace` is the primary namespace.
-While there is a separate sub-namespace for the tracer, called :mod:`optrace.tracer`, 
-it is automatically included in the main namespace.
+All functionality from :mod:`optrace.tracer` is automatically included in this main namespace.
 
 .. testcode::
 
    import optrace as ot
 
-Classes can be now accessed as :python:`ot.Raytracer, ot.CircularSurface, ot.RaySource, ...`.
+Access classes using :python:`ot.Raytracer, ot.CircularSurface, ot.RaySource, ...`.
 
-optrace provides plotting functionality for images, spectra, media etc.
+optrace provides plotting functionality for images, spectra, surfaces and media.
 These plotting functions are included in the :mod:`optrace.plots` namespace.
 
 .. testcode:: 
@@ -89,7 +88,7 @@ These plotting functions are included in the :mod:`optrace.plots` namespace.
    import optrace.plots as otp
 
 The GUI is included in the namespace :mod:`optrace.gui`.
-Only the |TraceGUI| class is relevant there, so it can be directly imported in the main namespace:
+For the user, only the |TraceGUI| class is relevant there, so it can be directly imported in the main namespace:
 
 .. testcode::
 
@@ -99,27 +98,24 @@ Only the |TraceGUI| class is relevant there, so it can be directly imported in t
 Global Options
 ______________________
 
-Global options are controlled through the attributes of the 
-class :class:`optrace.global_options <optrace.global_options>`.
+Global options are set through the attributes of the class :class:`optrace.global_options <optrace.global_options>`.
 
 Progressbar
 ###################
 
-For calculation-intensive tasks a progress bar is displayed inside the terminal 
-that displays the progress and estimated remaining time.
-Here is an example:
+A progress bar displays the completion status in your terminal during calculation-intensive tasks:
 
 .. code-block:: text
 
    Rendering:  40% |############4                  | 8/20 [00:17<00:22]
 
-It can be turned off globally by:
+It can be deactivated using:
 
 .. testcode::
 
    ot.global_options.show_progressbar = False
 
-There is also a context manager available for turning it off temporarily:
+There is also a context manager available for turning it off temporarily only:
 
 .. code-block:: python
 
@@ -129,15 +125,15 @@ There is also a context manager available for turning it off temporarily:
 Warnings
 ###################
 
-optrace outputs warnings of type :exc:`OptraceWarning <optrace.warnings.OptraceWarning>` 
-(which are a custom subclass of :exc:`UserWarning`). These can be filtered using the :mod:`warnings` python module.
-A simple way to silence them, for example when doing many automated tasks, is by writing:
+optrace outputs warnings of type :exc:`OptraceWarning <optrace.warnings.OptraceWarning>`, 
+which are a custom subclass of :exc:`UserWarning`. They can be filtered using the :mod:`warnings` python module.
+A simple way to silence them, for instance when doing many automated tasks, is by assigning:
 
 .. testcode::
 
    ot.global_options.show_warnings = False
 
-There is also a context manager available for turning it off temporarily:
+There is also a context manager available for turning them off temporarily:
 
 .. code-block:: python
 
@@ -147,8 +143,8 @@ There is also a context manager available for turning it off temporarily:
 Multithreading
 ###################
 
-By default, multithreading parallelizes tasks like raytracing and image rendering.
-However, this is undesired in some cases, especially when debugging or running multiple raytracers in parallel.
+By default, multithreading parallelizes tasks like raytracing, focus search and image rendering.
+However, it can be undesired in some cases, especially when debugging or running multiple raytracers in parallel.
 Multithreading can be turned off with:
 
 .. testcode::
@@ -161,8 +157,8 @@ A specific number of cores/threads can be set with the approach in Section :numr
 Wavelength Range
 ###################
 
-optrace is optimized for operation for the visible wavelength range of 380 - 780 nm.
-The range can be extended by:
+optrace is optimized for operation in the visible wavelength range of 380 - 780 nm.
+However, the range can be extended by setting new bounds:
 
 .. testcode::
 
@@ -176,11 +172,10 @@ Spectral Colormap
 
 Spectral plots (spectrum, refractive index, ray coloring) use a spectral colormap 
 that maps wavelength values to their corresponding colors.
-For the visible range, this leads to a rainbow-like mapping.
+This leads to a rainbow-like mapping for the visible range.
 
-When working in the infrared or ultraviolet region, they would be mapped to a similar hue and a nearly black color.
-To make different values discernible, a custom mapping function should be supplied instead.
-One example could be:
+The default spectral mapping is inappropriate for working in the infrared or ultraviolet region.
+A custom mapping for better value differentiation is supplied by:
 
 .. testcode::
 
@@ -188,13 +183,13 @@ One example could be:
    
    ot.global_options.spectral_colormap = lambda wl: plt.cm.viridis((wl-300)/800)
 
-In this example the colormap is adapted to use the 
+In this example the colormap is set to the
 `viridis colormap from pyplot <https://matplotlib.org/stable/users/explain/colors/colormaps.html#sequential>`_,
 where 300 is mapped to the lowest value of 0 and 800 to the highest value of 1.
 The specified function should take a wavelength numpy array (of some length N) as argument 
 and return a two dimensional array with RGBA values between 0-1 and shape (N, 4).
 
-The colormap can be reset by setting it to :python:`None`.
+The colormap can be reset to its default by setting it to :python:`None`.
 
 .. testcode::
    :hide:
@@ -207,10 +202,7 @@ UI Dark Mode
 ###################
 
 The UI dark mode is enabled by default.
-It can be changed by setting the :python:`ui_dark_mode` parameter.
-Changes are applied to all current GUI windows as well as new ones.
-
-To deactivate the mode, use:
+To activate the light mode, use:
 
 .. testcode::
 
@@ -230,20 +222,19 @@ To deactivate the mode, use:
 
    With :python:`ui_dark_mode` disabled.
 
+Changes are applied to all current GUI windows as well as new ones.
 
 Plot Dark Mode
 ###################
 
-For the content of plotting windows, there is a separate option :python:`plot_dark_mode`.
-It is also enabled by default.
-
+A separate option :python:`plot_dark_mode` is available for the content of the plotting windows.
 To deactivate it, use:
 
 .. testcode::
 
    ot.global_options.plot_dark_mode = False
 
-Deactivating it is useful for documentation or article output, where image are typically shown on a white background.
+Light mode is especially useful for academic output, where images are shown on a white background.
 Note that changes are only applied to new :obj:`pyplot <matplotlib.pyplot>` windows, not already opened ones.
 
 .. list-table::
@@ -284,25 +275,26 @@ Using an environment variable from the terminal calling python:
 
     export PYTHON_CPU_COUNT=4
 
-Or from within your python script, so it is applied only locally:
+Or from within your python script, so it is applied locally only:
 
 .. code-block:: python
 
    import os
    os.environ["PYTHON_CPU_COUNT"] = 4
 
-   # do the computations with 4 threads
+   # do computations with 4 threads
    ...
 
-It is important to note that only some actions use multithreading, and only fewer work with all available/specified 
-cores. Setting the CPU count only provides an upper limit.
+It is important to note that only some actions use multithreading, 
+and only a few functions work with all available/specified cores. 
+Setting the CPU count only provides an upper limit.
 
 Running optrace on Wayland
 _____________________________________
 
-There seem to be some remaining issues for Wayland on Linux in optrace's dependencies
+Issues persist when running vtk under Wayland on Linux
 (`vtk/issues/18701 <https://gitlab.kitware.com/vtk/vtk/-/issues/18701>`__, `pyvistaqt/issues/445 <https://github.com/pyvista/pyvistaqt/issues/445>`__).
-This leads to the following error:
+The following error message appears:
 
 .. code-block:: text
 
@@ -312,7 +304,7 @@ This leads to the following error:
    Serial number of failed request: 7
    Current serial number in output stream: 8
 
-Set the following environment variable in your terminal before running Python, so X11 is used for the application:
+Before running Python, set the following environment variable, so the X11 windowing system is used instead:
 
 .. code-block:: bash
 

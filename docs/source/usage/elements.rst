@@ -28,11 +28,12 @@ __________________
 Types
 ##############
 
-In optrace the class |Element| denotes an object which has 0-2 surfaces and belongs to the tracing geometry.
+An |Element| combines 0 to 2 surfaces
+and builds a 3D representable and/or raytraceable object in the raytracing geometry.
 
 **Tracing Elements**
 
-Tracing elements are Elements with direct ray interaction:
+Tracing elements are elements with direct ray interaction:
 
 .. list-table::
    :widths: 100 400
@@ -44,15 +45,15 @@ Tracing elements are Elements with direct ray interaction:
    * - |Lens|
      - An element with two surfaces on which light is refracted.
    * - |IdealLens|
-     - A Lens, except that it has a planar surface and refracts light without aberrations
+     - An infinitely thin Lens that refracts light without aberrations
    * - :class:`Filter <optrace.tracer.geometry.filter.Filter>`
-     - Element with a surface on which wavelength-dependent filtering takes place.
+     - Element with wavelength-dependent filtering on its surface.
    * - :class:`Aperture <optrace.tracer.geometry.aperture.Aperture>`
-     - Similar to a Filter, except that incident light is completely absorbed.
+     - Filter with complete absorption for intersecting rays.
 
 **Rendering Elements**
 
-Elements with no ray interaction for tracing, but the ability to render images of intersecting rays.
+Rendering elements have no ray interaction, but the ability to render images of intersecting rays.
 
 .. list-table::
    :widths: 100 400
@@ -65,7 +66,7 @@ Elements with no ray interaction for tracing, but the ability to render images o
 
 **Markers**
 
-Markers are Elements for annotations in 3D space.
+Markers are used for annotations in 3D space.
 
 .. list-table::
    :widths: 100 400
@@ -80,7 +81,7 @@ Markers are Elements for annotations in 3D space.
 
 **Volumes**
 
-Objects for plotting volumes in the TraceGUI, for instance an enclosing cylinder or a medium outline.
+Volumes are enclosing surfaces, such as boxes or cylinders, for combining, decorating or highlighting other objects.
 
 .. list-table::
    :widths: 100 400
@@ -99,7 +100,7 @@ Objects for plotting volumes in the TraceGUI, for instance an enclosing cylinder
 Shared Functions/Properties
 ##############################
 
-All subclasses of |Element| share the following methods and properties.
+All classes described above are subclasses of |Element| that share the following methods and properties:
 
 **Position**
 
@@ -110,9 +111,9 @@ The position of the element is accessed using:
    pos = El.pos
 
 This returns a three element list with x, y, z coordinates.
-For an element consisting of a singular surface, line or point, 
+For an element consisting of a single surface, line or point, 
 the returned value is identical to the position of this surface/line/point.
-For an element consisting of two surfaces, the position depends on how the object was specified, 
+For an element consisting of two surfaces, the position depends on how the object was initially specified, 
 for instance see :ref:`usage_lens`. 
 
 **Extent**
@@ -134,11 +135,12 @@ A single parameter describes the new absolute position as list :python:`[x, y, z
 
    El.move_to([0.2, -1.25, 3])
 
-The element is moved in such a way that the provided position is its new :python:`El.pos`.
+After moving, the specified position is its new :python:`El.pos`.
 
 **Rotation**
 
-Using the :python:`rotate` function the objects can be rotated around the z-axis and around their center.
+Using the :python:`rotate` function, 
+the objects are rotated around a rotation axis parallel to the z-axis through the center of element :python:`El.pos`.
 The function takes a rotation angle in degrees as parameter:
 
 .. code-block:: python
@@ -163,21 +165,21 @@ Overview
 
 
 A :class:`RaySource <optrace.tracer.geometry.ray_source.RaySource>` 
-defines the properties for rays it creates, including
+defines the properties for the rays it creates, including
 
 * Emitting surface/point/line
+* Ray starting position
 * Light distribution on this area
 * Emitted spectrum and power
 * Ray polarization
 * Ray orientation
 * Ray divergence
-* Source position
 
 
 Surface/Point/Line Parameter
 ##################################
 
-A RaySource supports the following base shapes :python:`Point, Line, CircularSurface, RectangularSurface, RingSurface`, 
+A RaySource supports the base shapes :python:`Point, Line, CircularSurface, RectangularSurface, RingSurface`, 
 which are provided as first parameter to the :python:`RaySource()` constructor.
 
 .. testcode::
@@ -198,8 +200,8 @@ The position in three-dimensional space is provided by the :python:`pos`-paramet
 Power Parameter
 ##################################
 
-Providing the :python:`power` the cumulative power of all rays is defined. This proves especially 
-useful when working with multiple sources with different power ratios.
+Providing the :python:`power`-parameter, the cumulative power of all rays is defined. 
+This is useful when working with multiple sources with different powers.
 
 .. testcode::
 
@@ -234,7 +236,7 @@ mode :python:`orientation="Converging"` should be employed:
 
 It is also possible to define orientations as a function of the position of the rays. 
 For this we need to set :python:`orientation="Function"` and provide the :python:`or_func` parameter.
-This parameter takes two numpy arrays containing the x and y-position 
+This function requires two numpy arrays containing the x and y-position 
 and returns a two dimensional array with cartesian vector components in rows.
 
 .. testcode::
@@ -308,8 +310,8 @@ and return a normalized or unnormalized probability.
    RS = ot.RaySource(circ, divergence="Function", div_func=lambda e: np.cos(e)**2, div_angle=10)
 
 For all the combinations above we can also generate a direction distribution inside an circular arc instead of a cone. 
-The correct way to do this is by setting :python:`div_2d=True`. With :python:`div_axis_angle`
-we can additionally define the orientation of this arc distribution.
+The correct way to do this is by setting :python:`div_2d=True`.
+With :python:`div_axis_angle`, we can additionally define the orientation of this arc distribution.
 
 .. testcode::
 
@@ -319,13 +321,16 @@ we can additionally define the orientation of this arc distribution.
 Image Parameter
 ##################################
 
-Alternatively to a uniformly emitting area, there is a way to provide light distributions (modelled by images).
+Alternatively to a uniformly emitting area, there is a way to provide light distributions modelled by images.
 
-This emitting surface needs to be a :class:`ScalarImage <optrace.tracer.image.scalar_image.ScalarImage>`
+This emitting surface needs to be a :class:`ScalarImage <optrace.tracer.image.scalar_image.ScalarImage>`,
+:class:`GrayscaleImage <optrace.tracer.image.grayscale_image.GrayscaleImage>`,
 or :class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>` object.
 A :class:`RectangularSurface <optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface>` 
 emitting this image will be created automatically.
 Its size will be equal to the side lengths of the image.
+
+Examples: 
 
 .. testcode::
 
@@ -345,14 +350,14 @@ Its size will be equal to the side lengths of the image.
 Every image color generates a specific physical spectrum matching its color. 
 This spectrum is a linear combination of the sRGB primaries in :numref:`random_srgb`.
 
-With :python:`image` specified the :python:`spectrum` parameter won't be used.
+With :python:`image` specified, the :python:`spectrum` parameter won't be used.
 
 Polarization Parameter
 ##################################
 
 The polarization parameter describes the distribution of linear light polarizations.
 
-In the default case the directions are random, parametrized by :python:`polarization="Uniform"`.
+In the default case, the directions are random, parametrized by :python:`polarization="Uniform"`.
 
 .. testcode::
 
@@ -393,8 +398,7 @@ the angular values in :python:`pol_angles` and their probabilities in :python:`p
 Lastly, a user defined function is set with  :python:`polarization="Function"` and the :python:`pol_func` parameter.
 This parameter takes angles in range :math:`[0, ~2 \pi]` and returns a normalized or unnormalized probability.
 
-Above we talked how for instance for :python:`polarization="x"` the rays are parallel to the x-axis. 
-However, depending on their actual ray orientation this isn't always the case. 
+Depending on the actual ray orientation, :python:`polarization="x"` can not be orientated in x-direction only.
 Read about what the angles mean for rays not parallel to the optical axis in :numref:`polarization_sampling`.
 
 .. testcode::
@@ -413,7 +417,7 @@ Overview
 
 A :class:`Lens <optrace.tracer.geometry.lens.Lens>` consists of two surfaces 
 and a medium with a :class:`RefractionIndex <optrace.tracer.refraction_index.RefractionIndex>` inbetween.
-Additionally, the position and a thickness parameter is required.
+Additionally, the position and a thickness parameter are required.
 
 Example
 ##################################
@@ -465,13 +469,13 @@ For instance, a concave lens can be defined with:
 
    L = ot.Lens(sph2, sph1, n=n, pos=[0, 2, 10], d=0.5)
 
-When the lens is defined by :python:`d` or :python:`de` the position :python:`pos[2]` 
+When the lens is defined by :python:`d` or :python:`de`, the position :python:`pos[2]` 
 is at the center of the :python:`d` or :python:`de` distance.
 
-With the :python:`d1` and :python:`d2` parameters we can control the position of both surfaces relative 
-to the lens position manually. 
+We can control the position of both surfaces relative to the lens position manually
+with the :python:`d1` and :python:`d2` parameters. 
 For instance, with :python:`d1=0, d2=...` the lens front starts exactly at the :python:`pos` of the Lens.
-On the other hand setting :python:`d1=..., d2=0` leads to the back surface center ending at :python:`pos`.
+On the other hand, setting :python:`d1=..., d2=0` leads to the back surface center ending at :python:`pos`.
 
 
 .. figure:: ../images/lens_thickness_position.svg
@@ -479,7 +483,7 @@ On the other hand setting :python:`d1=..., d2=0` leads to the back surface cente
    :width: 600
    :class: dark-light
 
-   Defining a convex lens by ``de=...``, by ``d1=0, d2=...`` and by ``d1=..., d2=0``.
+   Defining a convex lens through ``de=...``, by ``d1=0, d2=...`` and by ``d1=..., d2=0``.
 
 
 All cases in-between are also viable, for instance:
@@ -488,8 +492,8 @@ All cases in-between are also viable, for instance:
 
    L = ot.Lens(sph1, sph2, n=n, pos=[0, 2, 10], d1=0.1, d2=0.6)
    
-But only as long as the surfaces don't collide.
-With a Lens object you can also access the thickness parameters:
+`...` But only as long as the surfaces don't collide.
+With a Lens object, you can also access the thickness parameters:
 
 .. doctest::
 
@@ -523,10 +527,11 @@ Paraxial Properties
 ##################################
 
 
-Paraxial analysis by using transfer matrix is described in :numref:`usage_tma`.
-As for a setup of many lenses, we can also do paraxial analysis on a simple lens.
-To create a ray transfer matrix analysis object (:class:`TMA <optrace.tracer.transfer_matrix_analysis.TMA>` object) 
-we call the member function :python:`tma()`.
+The paraxial analysis functionality is described in :numref:`usage_tma`.
+To create a ray transfer matrix analysis object (:class:`TMA <optrace.tracer.transfer_matrix_analysis.TMA>` object)
+for a lens, we call the member function :python:`tma()`.
+
+Calculating the effective focal length of the lens is as simple as:
 
 .. doctest::
 
@@ -534,8 +539,9 @@ we call the member function :python:`tma()`.
    >>> tma.efl
    12.749973...
 
-As the behavior can differ with the light wavelength, we can also provide a non-default wavelength in nanometers.
-As the lens object itself has no knowledge of the geometry surrounding it, the prior medium it is undefined. 
+A wavelength parameter can be provided for dispersive lenses.
+As the lens object itself has no knowledge of the geometry surrounding it, 
+the prior medium is undefined (the subsequent is however defined by :python:`Lens.n2`). 
 By default, a constant refractive index of 1 is assumed, but can be overwritten with the parameter :python:`n0`.
 
 .. doctest::
@@ -548,18 +554,18 @@ By default, a constant refractive index of 1 is assumed, but can be overwritten 
 Ideal Lens
 _____________
 
-
-An :class:`IdealLens <optrace.tracer.geometry.ideal_lens.IdealLens>` focusses and images light perfectly 
-and without aberrations according to the imaging equation. 
-The geometry is an infinitesimal thin circular area with radius :python:`r`.
+An :class:`IdealLens <optrace.tracer.geometry.ideal_lens.IdealLens>` produces no aberrations
+and focusses light perfectly according to the imaging equation. 
+Its visual geometry is an infinitesimal thin circular area with radius :python:`r`.
 Additionally, the optical power :python:`D` and a position :python:`pos` need to be provided.
 
 .. testcode::
 
    IL = ot.IdealLens(r=5, D=12.5, pos=[0, 0, 9.5])
 
-As for a normal Lens, it is possible to define a :python:`n2`. 
-Note that this does not change the optical power or focal length, as they are controlled by the :python:`D` parameter.
+As for a normal Lens, it is possible to define a subsequent medium :python:`n2`. 
+Note that this does not change the optical power or the focal length, 
+as both are defined by the :python:`D` parameter.
 
 .. testcode::
 
@@ -570,7 +576,7 @@ Note that this does not change the optical power or focal length, as they are co
 Filter
 ___________
 
-When light hits a :class:`Filter <optrace.tracer.geometry.filter.Filter>`,
+For light hitting the :class:`Filter <optrace.tracer.geometry.filter.Filter>`,
 the ray power is transmitted according to the filter's transmittance function.
 
 A Filter is defined by a Surface, a position and the 
@@ -582,10 +588,9 @@ A Filter is defined by a Surface, a position and the
    circ = ot.CircularSurface(r=5)
    F = ot.Filter(circ, pos=[0, 0, 23.93], spectrum=spec)
 
-
-With a filter the approximate sRGB color is calculated with :python:`F.color()`. 
-The fourth return value is the opacity for visualization.
-Note that the opacity is more of a visual extra than a physically correct simulation.
+An approximate sRGB color of the Filter is calculated with :python:`F.color()`. 
+The fourth return value is the opacity for visualization. 
+Note that the opacity is optimized for visual display and not for a physically correct representation.
 
 Calling the filter with a wavelength array returns the transmittance at these wavelengths.
 
@@ -600,9 +605,9 @@ Aperture
 ________________
 
 An :class:`Aperture <optrace.tracer.geometry.aperture.Aperture>` is just a 
-:class:`Filter <optrace.tracer.geometry.filter.Filter>` that absorbs light completely for rays that hit it. 
+:class:`Filter <optrace.tracer.geometry.filter.Filter>` that absorbs light of any ray hitting it. 
 In the most common use cases a :class:`RingSurface <optrace.tracer.geometry.surface.ring_surface.RingSurface>` 
-is employed as Aperture surface.  As for all other elements, we also need to specify the position :python:`pos`.
+is employed as Aperture surface. As for all other elements, we also need to specify the position :python:`pos`.
 
 .. testcode::
 
@@ -613,7 +618,9 @@ Detector
 __________________
 
 A :class:`Detector <optrace.tracer.geometry.detector.Detector>` enables the rendering of images 
-and spectra on its geometry. But by itself, it has no effect on raytracing.
+and spectra on its geometry. It has no effect on any rays by itself.
+Making the detector non-interacting has the advantage 
+that the rays don't need to be recalculated when the detector is moved or changed in any other way.
 
 It takes a surface parameter and the position parameter as arguments.
 
@@ -633,14 +640,14 @@ A :class:`PointMarker <optrace.tracer.geometry.marker.point_marker.PointMarker>`
 annotates positions or elements inside the tracing geometry. 
 As all markers, is has no influence on the tracing process.
 
-In the simplest case a :python:`PointMarker` is defined with a text string and a position 
+In the simplest case, a :python:`PointMarker` is defined with a text string and a position 
 for the :class:`Point <optrace.tracer.geometry.point.Point>`.
 
 .. testcode::
 
    M = ot.PointMarker("Text132", pos=[0.5, 9.1, 0.5])
 
-One can scale the text and marker with :python:`text_factor` or :python:`marker_factor`.
+The visual display of text and marker is scaled with :python:`text_factor` or :python:`marker_factor`.
 The actual size change is handled by the plotting GUI.
 
 .. testcode::
@@ -653,7 +660,7 @@ We can also hide the marker point and only display the text with the parameter :
 
    M = ot.PointMarker("Text132", pos=[0.5, 9.1, 0.5], label_only=True)
 
-Conversly, text can be hidden by leaving the text empty:
+Conversely, text can be hidden by leaving the text empty:
 
 .. testcode::
 
@@ -663,11 +670,10 @@ Conversly, text can be hidden by leaving the text empty:
 LineMarker
 #################
 
-
 Similarly, a :class:`LineMarker <optrace.tracer.geometry.marker.line_marker.LineMarker>` 
 is a :class:`Line <optrace.tracer.geometry.line.Line>` in the xy-plane with a text annotation.
 
-In the simplest case a :python:`LineMarker` is defined by a text string, radius, angle and a position.
+In the simplest case, a :python:`LineMarker` is defined by a text string, radius, angle and a position.
 
 .. testcode::
 
@@ -696,8 +702,9 @@ __________________
 BoxVolume
 ###############
 
-As for a :class:`RectangularSurface <optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface>`, 
-the parameter :python:`dim` defines the x- and y-side lengths in the lateral plane. 
+For a :class:`BoxVolume <optrace.tracer.geometry.volume.box_volume.BoxVolume>`,
+the parameter :python:`dim` defines the x- and y-side lengths in the lateral plane,
+the same as for a :class:`RectangularSurface <optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface>`.
 Parameter :python:`pos` describes the center of this rectangle. 
 For a :class:`BoxVolume <optrace.tracer.geometry.volume.box_volume.BoxVolume>` this surface gets extended
 by length :python:`length` in positive z-direction, forming a three-dimensional volume.
@@ -750,14 +757,12 @@ As for the other volumes, the plotting opacity and color can be specified:
 Custom Volumes
 #######################
 
-
 A custom :class:`Volume <optrace.tracer.geometry.volume.volume.Volume>` 
 makes it possible to define user-defined volumes. 
 It requires a front and back surface as parameter, as well as a position and the thickness distances :python:`d1, d2`. 
 These have the same meaning as for a :class:`Lens <optrace.tracer.geometry.lens.Lens>` 
 in :numref:`usage_lens_thickness`.
-
-You can find an example below:
+An example is located below.
 
 .. testcode::
 
@@ -765,7 +770,7 @@ You can find an example below:
    back = ot.RectangularSurface(dim=[3, 3])
    vol = ot.Volume(front, back, pos=[0, 1, 2], d1=front.ds, d2=back.ds+1)
 
-Here a conic front surface and a rectangular surface are defined. :python:`front.ds, back.ds` 
-denote the total thickness of both surfaces at their center. 
+A conic front surface and a rectangular surface are defined. 
+:python:`front.ds, back.ds` denote the total thickness of both surfaces at their center. 
 The overall length for this volumes is then :python:`front.ds + back.ds + 1`.
 

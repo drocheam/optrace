@@ -101,20 +101,20 @@ standard: list = [*standard_natural, *standard_f, *standard_led]
 
 srgb_r: LightSpectrum = LightSpectrum("Function", func=color.srgb_r_primary,
                                       desc="R", long_desc="sRGB R Primary")
-"""Exemplary sRGB R Primary Spectrum"""
+"""One possible sRGB R Primary Spectrum"""
 
 srgb_g: LightSpectrum = LightSpectrum("Function", func=color.srgb_g_primary,
                                       desc="G", long_desc="sRGB G Primary")
-"""Exemplary sRGB G Primary Spectrum"""
+"""One possible sRGB G Primary Spectrum"""
 
 srgb_b: LightSpectrum = LightSpectrum("Function", func=color.srgb_b_primary,
                                       desc="B", long_desc="sRGB B Primary")
-"""Exemplary sRGB B Primary Spectrum"""
+"""One possible sRGB B Primary Spectrum"""
 
 srgb_w: LightSpectrum = LightSpectrum("Function", func=lambda wl: color.srgb_r_primary(wl) +
                                                                   color.srgb_g_primary(wl) + color.srgb_b_primary(wl),
                                       desc="W", long_desc="sRGB White Spectrum")
-"""Exemplary sRGB White Spectrum"""
+"""One possible sRGB White Spectrum"""
 
 srgb_r_power_factor, srgb_g_power_factor, srgb_b_power_factor = color.SRGB_PRIMARY_POWER_FACTORS
 """Power ratios for white mixing from sRGB primaries"""

@@ -106,7 +106,7 @@ This project is published under the [MIT License](https://github.com/drocheam/op
    * [RayOptics](https://ray-optics.readthedocs.io/en/latest/) by Michael Hayford. Tracing and optical design analysis tool. 
    * [rayopt](https://github.com/quartiq/rayopt) by QUARTIQ. Tracing and optical design analysis tool. 
    * [tracepy](https://github.com/TracePy-Org/tracepy) by Gavin Niendorf. Simple raytracing tool with optimization features.
-   * [Optiland](https://optiland.readthedocs.io/en/latest/index.html) by Harrison Kramer. Comprehensive optical design and analysis framework with a 3D viewer.
+   * [Optiland](https://optiland.readthedocs.io/en/latest/index.html) by Kramer Harrison. Comprehensive optical design and analysis framework with a 3D viewer.
 
 - Wave Optics
    * [diffractsim](https://github.com/rafael-fuente/diffractsim) by Rafael de la Fuente. Wave optics simulation of arbitrary apertures and phase holograms.

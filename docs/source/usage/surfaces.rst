@@ -15,10 +15,10 @@ Base Shapes (Surface, Line, Point)
 Overview
 _________________
 
-Surfaces, points and lines are the base component for all |Element| classes. 
+Surfaces, points and lines are the base components for all |Element| classes. 
 They describe a geometrical behavior relative to their center (marked as "x" in the following figures).
-They have no absolute position in three-dimensional space, 
-their actual position is assigned and managed by their owner Element.
+They have no absolute position in three-dimensional space yet, 
+as their actual position is assigned and managed by their owner Element.
 All lengths are given in millimeters and angles in degrees.
 
 
@@ -49,7 +49,7 @@ Both types have no extent in z-direction, therefore lie exclusively on a  xy-pla
           Line geometry
 
 
-To create a point write:
+To create a point, write:
 
 .. testcode::
 
@@ -71,7 +71,7 @@ Planar surfaces are purely two-dimensional and have no extent in z-direction, th
 :class:`CircularSurfaces <optrace.tracer.geometry.surface.circular_surface.CircularSurface>` 
 is often used for plan-concave or plan-convex lenses or color filters.
 :class:`RingSurfaces <optrace.tracer.geometry.surface.ring_surface.RingSurface>` and
-`SlitSurfaces <optrace.tracer.geometry.surface.slit_surface.SlitSurface>` are typically found for Apertures, 
+:class:`SlitSurfaces <optrace.tracer.geometry.surface.slit_surface.SlitSurface>` are typically found for Apertures, 
 and :class:`RectangularSurfaces <optrace.tracer.geometry.surface.rectangular_surface.RectangularSurface>` 
 for detectors or object images.
 
@@ -115,7 +115,7 @@ A circle/disc of radius 3.5 is created by:
 
    Disc = ot.CircularSurface(r=3.5)
 
-When constructing a ring surface an additional inner radius :math:`0 < r_\text{i} < r` is required:
+When constructing a ring surface, an additional inner radius :math:`0 < r_\text{i} < r` is required:
 
 .. testcode::
 
@@ -204,7 +204,7 @@ A conic surface is defined by the conic section equation:
    z(r)= z_0 + \frac{\rho r^{2}}{1+\sqrt{1-(1+k)(\rho r)^{2}}}
 
 With the curvature :math:`\rho = 1/R` and the conical constant :math:`k`.
-Depending on this constant the type of conic section differs:
+Depending on this constant, the type of conic section differs:
 
 .. list-table::
    :align: center
@@ -227,8 +227,7 @@ Depending on this constant the type of conic section differs:
    :align: center
    :class: dark-light
 
-   Conic surface geometry with a different conic constant :math:`k` signs. 
-   An aspheric surface has a small additional rotationally symmetric polynomial added.
+   Conic surface geometry with same :math:`R` but different conic constant :math:`k` signs. 
 
 Compared to the spherical surface, a :class:`ConicSurface <optrace.tracer.geometry.surface.conic_surface.ConicSurface>` 
 takes another parameter, the conical constant :python:`k`:
@@ -265,10 +264,10 @@ ____________________
 **Overview**
 
 The :class:`FunctionSurface2D <optrace.tracer.geometry.surface.function_surface_2d.FunctionSurface2D>` 
-class allows us to define custom surfaces, defined by a mathematical function depending on x and y.
-For functions with rotational symmetry we can also use the 
-:class:`FunctionSurface1D <optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D>` class, 
-where the values are only dependent on the radial distance r.
+class allows for the definition of custom surfaces, defined by a mathematical function depending on x and y.
+For functions with rotational symmetry the 
+:class:`FunctionSurface1D <optrace.tracer.geometry.surface.function_surface_1d.FunctionSurface1D>` 
+class should be preferred, where the values are only dependent on the radial distance r.
 
 
 .. figure:: ../images/function_surface.svg
@@ -276,20 +275,20 @@ where the values are only dependent on the radial distance r.
    :align: center
    :class: dark-light
 
-   Custom function according to :math:`z_\text{s}(x,~y)`, which can be a symmetric or asymmetric function or a dataset
+   Custom function according to :math:`z_\text{s}(x,~y)`, which can be a symmetric or asymmetric function or a dataset.
 
 
 **Simplest case**
 
-As an example we want to create an axicon surface:
+As an example, an axicon surface is created as:
 
 .. testcode::
 
    func = ot.FunctionSurface1D(r=3, func=lambda r: r)
 
-The user defined function must take r-values (as numpy array), 
-return a numpy array and is provided as the :python:`func` parameter.
-Note that the surface offset at :math:`r=0` is irrelevant, as it will be automatically compensated for.
+The user defined function is provided as the :python:`func` parameter and takes r-values as numpy array as argument,
+while also returning a numpy array.
+Note that a surface offset is irrelevant, as the surface will be shifted automatically at a later point. 
 
 **Providing partial derivatives**
 
@@ -332,13 +331,11 @@ For :python:`deriv_func` it is :python:`deriv_args`.
 **z-Range**
 
 When initializing a surface, optrace tries to determine the surface extent in z-direction. 
-The resulting :python:`z_min` and :python:`z_max` values are needed to know the surface bounds, 
-which in turn are needed for tracing of the surface.
+These resulting axial surface bounds :python:`z_min` and :python:`z_max` are needed for tracing of the surface.
 While this works automatically in many cases, the user has the option to provide these values manually.
-If these values should largely differ from the automatically estimated values a warning or,
-for a large deviation, an exception is raised.
+An exception is raised if the provided values deviate severely from the estimated values.
 
-For a :python:`a=-0.3` and :python:`r=3` the z-bounds are :python:`[-0.9, 0]`. 
+For :python:`a=-0.3` and :python:`r=3` the z-bounds are :python:`[-0.9, 0]`. 
 This can be provided using:
 
 .. code-block:: python
@@ -348,9 +345,9 @@ This can be provided using:
 
 **Radius of Curvature**
 
-We can also provide a radius of curvature for the paraxial region. 
+We can also provide a radius of curvature for the paraxial region near the optical axis. 
 This will be useful for ray transfer matrix analysis in section :numref:`usage_tma`. 
-Note that this only makes sense for surfaces with rotational symmetry near the center.
+Note that this is only reasonable for surfaces with rotational symmetry near the center.
 
 .. code-block:: python
 
@@ -386,7 +383,7 @@ is defined by a height dataset in a square matrix.
 This square set is cut into a circular disc after initialization.
 Together with this set, the radius of the disc is required.
 
-It is recommended to have 200x200 element or even larger matrices. 
+It is recommended to provide 200x200 element or even larger matrices. 
 Values between data cells are interpolated with a polynomial of forth order for smooth curvature changes.
 
 The following example creates a lens with direction-dependent curvature and noise/manufacturing errors added:
@@ -400,14 +397,13 @@ The following example creates a lens with direction-dependent curvature and nois
 
    data2d = ot.DataSurface2D(r=r0, data=H)
 
-
-Note that we can also add the parameters :python:`z_min=...`, :python:`z_max=`, :python:`parax_roc`, 
-as for the FunctionSurface class.
+As for the FunctionSurface class, parameters :python:`z_min=...`, :python:`z_max=`, :python:`parax_roc` 
+can be optionally provided.
 
 **DataSurface1D**
 
-For a surface with rotational symmetry one radial vector is sufficient.
-For this we utilize the :class:`DataSurface1D <optrace.tracer.geometry.surface.data_surface_1d.DataSurface1D>` class:
+One radial vector is sufficient for a surface with rotational symmetry.
+For this, the :class:`DataSurface1D <optrace.tracer.geometry.surface.data_surface_1d.DataSurface1D>` class is utilized:
 
 .. testcode::
 
@@ -452,7 +448,7 @@ Moving/setting its initial position of the surface/point/line is handled by its 
 
 **Rotation**
 
-Using the :python:`rotate` function the surface/point/line is rotated by 180 degrees around its 
+Using the :python:`rotate` function, the surface/point/line is rotated by 180 degrees around its 
 center around the z-axis.
 The function takes a rotation angle in degrees:
 

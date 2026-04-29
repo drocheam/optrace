@@ -62,7 +62,7 @@ To lower RAM usage, tox calls test groups instead of all tests at once.
 
 The workflow file `tox_test.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/tox_test.yml>`_ 
 runs the functionality tests on a defined system and python version as GitHub action.
-By default this is done on pushed code changes, but the action can also be run manually.
+By default, this is done on pushed code changes, but the action can also be run manually.
 
 
 Coverage Testing
@@ -130,7 +130,7 @@ runs multiple test environments. This includes:
 Python Version Testing
 __________________________________
 
-Testing of the compatibility with multiple python versions is done with the 
+Testing of the compatibility with multiple python versions is performed with the 
 `pyver_comp.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/pyver_comp.yml>`_ workflow.
 It executes a subset of tests (:bash:`tox -e fast`) for multiple python main versions in an Ubuntu runner.
 
@@ -145,7 +145,7 @@ The workflow is located in
 Platform Testing
 __________________________________
 
-Platform testing is done with the 
+Platform testing is performed with the 
 `os_comp.yml <https://github.com/drocheam/optrace/blob/main/.github/workflows/os_comp.yml>`_ workflow.
 It executes the os tox environment (run with :bash:`tox -e os`), which runs a subset of all available tests.
 These tests include relevant, possibly platform-dependent cases, including:

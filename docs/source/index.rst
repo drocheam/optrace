@@ -70,7 +70,7 @@ Geometrical Optics
    Tracing and optical design analysis tool. 
  * `tracepy <https://github.com/TracePy-Org/tracepy/>`__ by Gavin Niendorf.
    Simple raytracing tool with optimization features.
- * `Optiland <https://optiland.readthedocs.io/en/latest/index.html>`__ by Harrison Kramer.
+ * `Optiland <https://optiland.readthedocs.io/en/latest/index.html>`__ by Kramer Harrison.
    Comprehensive optical design and analysis framework with a 3D viewer.
 
 Wave Optics

@@ -468,7 +468,7 @@ def gauss(x: np.ndarray, mu: float, sig: float) -> np.ndarray:
 
 def srgb_r_primary(wl: np.ndarray) -> np.ndarray:
     """
-    Exemplary sRGB r primary curve.
+    One possible sRGB r primary curve.
 
     :param wl: wavelength vector, 1D numpy array
     :return: curve values, 1D numpy array
@@ -482,7 +482,7 @@ def srgb_r_primary(wl: np.ndarray) -> np.ndarray:
 
 def srgb_g_primary(wl: np.ndarray) -> np.ndarray:
     """
-    Exemplary sRGB g primary curve.
+    One possible sRGB g primary curve.
 
     :param wl: wavelength vector, 1D numpy array
     :return: curve values, 1D numpy array
@@ -496,7 +496,7 @@ def srgb_g_primary(wl: np.ndarray) -> np.ndarray:
 
 def srgb_b_primary(wl: np.ndarray) -> np.ndarray:
     """
-    Exemplary sRGB b primary curve.
+    One possible sRGB b primary curve.
 
     :param wl: wavelength vector, 1D numpy array
     :return: curve values, 1D numpy array

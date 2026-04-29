@@ -17,6 +17,21 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     
-    # run actual tests
+    - name: Setup Node
+      uses: actions/setup-node@v6
+      with:
+        node-version: "24"
+
+    - name: Install Playwright
+      run: |
+        npm init -y
+        npm install playwright
+        npx playwright install --with-deps chromium
+
+    # run standard tests
     - name: Run website tests
       run: bash ./tests/test_website.sh
+    
+    # check for connections other than github.io
+    - name: Run connection tests
+      run: bash ./tests/test_connections.sh

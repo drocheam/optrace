@@ -1152,7 +1152,7 @@ class Raytracer(Group):
         
         If pos is a list, len(pos) detector images are rendered. All other parameters are either automatically
         repeated len(pos) times or can be specified as list with the same length as pos.
-        Exemplary calls:
+        Example calls:
         >> RT.iterative_render(N=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=1)
         >> RT.iterative_render(N=10000, pos=[[0, 1, 0], [2, 2, 10]], detector_index=[0, 1], \
         extent=[None, [-2, 2, -2, 2]])

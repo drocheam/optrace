@@ -91,6 +91,7 @@ html_theme_options = {
     ],
     "accent_color": "cyan",
     "color_mode": "dark",
+    "show_ai_links": False,  # uses icons from api.iconify
 }
 
 html_context = {

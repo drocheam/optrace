@@ -80,7 +80,7 @@ This project is not affiliated with a package of the same name on PyPI.
 
 **Troubleshooting**
 
-* In many cases forcing the installation of a specific library version (e.g. vtk) circumvents issues of newer releases. 
+* In many cases, forcing the installation of a specific library version (e.g. vtk) circumvents issues of newer releases. 
   The syntax is: :bash:`pip install --force-reinstall -v "some-package==1.2.2"`.
   Often older releases are hosted outside of PyPi, so you might try to locate the packages first.
   A list of other wheels for vtk is found 

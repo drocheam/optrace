@@ -872,7 +872,7 @@ An example displaying multiple light spectrum plots, including the sRGB primarie
           :align: center
           :class: dark-light
 
-          Exemplary spectral curves for the sRGB color space primaries.
+          Example spectral curves for the sRGB color space primaries.
 
 .. figure:: ./images/cie_cmf.svg
    :width: 400

@@ -12,28 +12,31 @@ Refractive Indices
    import numpy as np
 
 
-Defining the Index
+Defining the Model
 ________________________
 
 **Constant**
 
-In the simplest case a constant (wavelength-independent) 
-:class:`refractive index <optrace.tracer.refraction_index.RefractionIndex>` is defined as:
+The simplest case, a constant (wavelength-independent) 
+:class:`RefractionIndex <optrace.tracer.refraction_index.RefractionIndex>`, is defined as:
 
 .. testcode::
 
    n = ot.RefractionIndex("Constant", n=1.54)
 
-**By Abbe Number**
+**Center Index and Abbe Number**
 
-In many cases materials are characterized by the index at a center wavelength and the Abbe number only.
-However, materials with these same quantities can still differ slightly.
+For most materials only a single refractive index :math:`n_c` and an Abbe number :math:`V` are provided, 
+but not a full :math:`n(\lambda)`-curve.
+Such a material is modelled by:
 
 .. testcode::
 
    n = ot.RefractionIndex("Abbe", n=1.5, V=32)
 
-Details on how the model is estimated are found in :numref:`index_from_abbe`.
+Note that materials with the same :math:`n_c`, :math:`V` can still differ slightly, 
+as many dispersion curves produce these two values.
+Details on how the model is estimated are located in :numref:`index_from_abbe`.
 
 You can also specify the wavelength combination, for which :python:`n` and :python:`V` are specified:
 
@@ -44,11 +47,11 @@ You can also specify the wavelength combination, for which :python:`n` and :pyth
 
 **Common Index Models**
    
-The subsequent equations describe common refractive index models used in simulation software.
+The subsequent equations describe common refractive index models used in typical simulation software.
 They are taken from :footcite:`ComsolDispersion` and :footcite:`ZemaxHagen`.
 A comprehensive list of different index models is found in :footcite:`palmer2005`.
 
-Generally, all coefficients must be given in powers of µm, while the same is true for the wavelength input.
+Generally, all coefficients must be expressed in powers of µm, which is also true for the wavelength input values.
 
 .. list-table::
    :widths: 300 900
@@ -145,7 +148,7 @@ Generally, all coefficients must be given in powers of µm, while the same is tr
           :label: n_schott 
 
 
-In the case of the Schott model, the initialization looks as follows:
+An example of a Schott model material is initialized in the following manner:
 
 .. testcode::
 
@@ -153,8 +156,8 @@ In the case of the Schott model, the initialization looks as follows:
 
 **User Data**
 
-With type :python:`"Data"` a wavelength and index vector should be provided.
-Values in-between are interpolated linearly.
+The :python:`"Data"` type allows a model definition from a wavelength in nanometers (380.0 - 780.0) and index list.
+Intermediary values are interpolated linearly.
 
 .. testcode::
 
@@ -164,25 +167,25 @@ Values in-between are interpolated linearly.
 
 **User Function**
 
-optrace supports custom user functions for the refractive index. 
-The function takes one parameter, which is a wavelength numpy array with wavelengths in nanometers.
+optrace supports custom user functions for the refractive index with the :python:`func`-parameter: 
 
 .. testcode::
 
    n = ot.RefractionIndex("Function", func=lambda wl: 1.6 - 1e-4*wl)
 
-When providing a function with multiple parameters, you can use the :python:`func_args` parameter.
+The first parameter must be the wavelength in nanometers, 
+while additional parameters are provided by the :python:`func_args` parameter.
 
 .. testcode::
 
    n = ot.RefractionIndex("Function", func=lambda wl, n0: n0 - 1e-4*wl, func_args=dict(n0=1.6))
 
 
-Getting the Index Values
-___________________________
+Calculating the Index Values
+______________________________
 
-The refractive index values are calculated when calling the refractive index object with a wavelength vector.
-The call returns a vector of the same shape as the input.
+Index values are calculated by calling the object with a wavelength vector.
+The return value is a vector of the same shape as the input.
 
 .. doctest::
 
@@ -194,7 +197,8 @@ The call returns a vector of the same shape as the input.
 Abbe Number
 __________________
 
-With a refractive index object at hand the Abbe number can be calculated with
+Every :class:`RefractionIndex <optrace.tracer.refraction_index.RefractionIndex>` object provides a 
+:meth:`abbe_number <optrace.tracer.refraction_index.RefractionIndex.abbe_number>`-method:
 
 .. doctest::
 
@@ -202,7 +206,7 @@ With a refractive index object at hand the Abbe number can be calculated with
    >>> n.abbe_number()
    44.850483919254984
 
-Alternatively the function can be called with a different spectral line combination 
+The function can be called with a different spectral line combination 
 from :mod:`ot.presets.spectral_lines <optrace.tracer.presets.spectral_lines>`:
 
 .. doctest::
@@ -210,34 +214,31 @@ from :mod:`ot.presets.spectral_lines <optrace.tracer.presets.spectral_lines>`:
    >>> n.abbe_number(ot.presets.spectral_lines.F_eC_)
    44.57150709341499
 
-Or specify a user defined list of three wavelengths:
+A list of predefined lines can be found in :numref:`spectral_lines`.
+You can also specify a user defined list of three wavelengths:
 
 .. doctest::
 
    >>> n.abbe_number([450, 580, 680])
    30.59379412865849
 
-
-You can also check if a medium is dispersive by calling
+To check if a medium is dispersive, call:
 
 .. doctest::
 
    >>> print(n.is_dispersive())
    True
 
-
-A list of predefined lines can be found in :numref:`spectral_lines`.
-
 .. _agf_load:
 
 Loading material catalogues (.agf)
 _________________________________________
 
-optrace can also load .agf catalogue files containing different materials.
+optrace supports importing ``.agf`` catalogue files that contain different material definitions.
 The function :func:`ot.load_agf <optrace.tracer.load.load_agf>` requires a file path and 
 returns a dictionary of media, with the key being the name and the value being the refractive index object.
 
-For instance, loading the Schott catalogue and accessing the material ``N-LAF21`` can be done as follows:
+For instance, a way to load the Schott catalogue and accessing the material ``N-LAF21`` is shown below.
 
 .. code-block:: python
 
@@ -245,10 +246,11 @@ For instance, loading the Schott catalogue and accessing the material ``N-LAF21`
    n_laf21 = n_schott["N-LAF21"]
 
 
-Different ``.agf`` files are found in `this repository <https://github.com/nzhagen/zemaxglass/tree/master/AGF_files>`__ 
+Different ``.agf`` files are located in
+`this repository <https://github.com/nzhagen/zemaxglass/tree/master/AGF_files>`__ 
 or `this one <https://github.com/edeforas/Astree/tree/master/glass>`__.
 
-Information on the file format can be found `here <https://neurophysics.ucsd.edu/Manuals/Zemax/ZemaxManual.pdf>`__ and
+Information on the file format are available `here <https://neurophysics.ucsd.edu/Manuals/Zemax/ZemaxManual.pdf>`__ and
 and `here <https://github.com/nzhagen/zemaxglass/blob/master/ZemaxGlass_user_manual.pdf>`__.
 
 Plotting
@@ -262,13 +264,12 @@ See :ref:`index_plots`.
 Presets
 _________________
 
-optrace comes with multiple material presets, which can be accessed using ``ot.presets.refractive_index.<name>``, 
+optrace provides many material presets, which can be accessed using ``ot.presets.refractive_index.<name>``, 
 where ``<name>`` is the material name.
-The materials are also grouped into multiple lists 
+The materials are also grouped into lists 
 :python:`ot.presets.refractive_index.glasses, ot.presets.refractive_index.plastics, ot.presets.refractive_index.misc`. 
 
-These groups are plotted below in an index and an Abbe plot.
-
+The following plots visualize the index curves and Abbe plots group-wise.
 
 .. list-table::
    :widths: 500 500
@@ -279,28 +280,28 @@ These groups are plotted below in an index and an Abbe plot.
           :align: center
           :class: dark-light
 
-          Refraction index curves for different glass presets.
+          Refraction index curves for the glass presets.
 
      - .. figure:: ../images/glass_presets_V.svg
           :width: 500
           :align: center
           :class: dark-light
        
-          Abbe diagram for different glass presets.
+          Abbe diagram for the glass presets.
    
    * - .. figure:: ../images/plastics_presets_n.svg
           :width: 500
           :align: center
           :class: dark-light
           
-          Refraction index curves for different plastic presets.
+          Refraction index curves for the plastic presets.
        
      - .. figure:: ../images/plastics_presets_V.svg
           :width: 500
           :align: center 
           :class: dark-light
           
-          Abbe diagram for different plastic presets.
+          Abbe diagram for the plastic presets.
 
 
    * - .. figure:: ../images/misc_presets_n.svg
@@ -315,8 +316,7 @@ These groups are plotted below in an index and an Abbe plot.
           :align: center
           :class: dark-light
           
-          Abbe diagram for miscellaneous presets. *Air* and *Vacuum* are missing here, 
-          because they are modelled without dispersion.
+          Abbe diagram for the miscellaneous presets. `Air` and `Vacuum` are modelled non-dispersive and missing in this plot.
 
 
 ------------

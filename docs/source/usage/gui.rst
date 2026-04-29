@@ -29,14 +29,14 @@ ____________________
 
 **Initializing the GUI**
 
-First, we need to import into the |TraceGUI| into the current namespace:
+First, we need to import the |TraceGUI| into the current namespace:
 
 .. testcode::
 
    from optrace.gui.trace_gui import TraceGUI
 
 
-Let's create some exemplary geometry:
+Create an example geometry as follows:
 
 .. testcode::
 
@@ -49,7 +49,7 @@ Let's create some exemplary geometry:
    eye = ot.presets.geometry.legrand_eye()
    RT.add(eye)
 
-To create a |TraceGUI|, we need to pass the |Raytracer| as argument:
+To create a |TraceGUI|, we need to pass the |Raytracer| as an argument:
 
 .. testcode::
 
@@ -57,13 +57,14 @@ To create a |TraceGUI|, we need to pass the |Raytracer| as argument:
 
 **Running the GUI**
 
-The GUI is run with:
+Run the GUI using:
 
 .. code-block:: python
 
    sim.run()
 
-This loads the main window and also raytraces the geometry if it hasn't already been traced.
+This displays the main window and also raytraces the geometry if it hasn't already been traced.
+Note that :meth:`TraceGUI.run <optrace.gui.trace_gui.TraceGUI.run>` is a blocking operation.
 
 **Parameters**
 
@@ -110,12 +111,12 @@ Scene
 
 **Overview**
 
-An overview of the mouse navigation and a list of keyboard shortcuts is provided below.
+An overview of the mouse navigation and keyboard shortcuts is provided below.
 
 .. list-table:: Available mouse and keyboards shortcuts inside the scene
    :header-rows: 1
-   :align: center
-   :widths: 100 300
+   :align: left
+   :widths: 75 300
 
    * - Shortcut
      - Function
@@ -127,53 +128,55 @@ An overview of the mouse navigation and a list of keyboard shortcuts is provided
      - Move the camera view
    * - Ctrl + Mouse drag
      - Rotate the camera view around the center of the scene window
-   * - ``+`` and ``-``
+   * - Keys ``+`` and ``-``
      - Zoom in or out
-   * - arrow keys
-     - move the camera view
-   * - shift + arrow keys
-     - rotate the camera view around the left-right or top-bottom axis of the scene
-   * - ``i``
-     - sets the scene view to default view set by GUI parameter :python:`initial_camera` or the y-side view if not provided
-   * - ``h``
-     - maximize scene (hides the sidebar)
-   * - ``v``
-     - toggle minimalistic view option
-   * - ``c``
-     - toggle high contrast mode
-   * - ``b``
-     - toggle label visibility
-   * - ``d``
-     - render detector image with the current settings
-   * - ``0``
-     - close all open pyplot plots
-   * - ``n``
-     - randomly re-chose the plotted rays
+   * - Arrow keys
+     - Move the camera view
+   * - Shift + arrow keys
+     - Rotate the camera view around the left-right or top-bottom axis of the scene
+   * - Key ``i``
+     - Sets the scene view to default view set by GUI parameter :python:`initial_camera` (y-side view if not provided)
+   * - Key ``h``
+     - Maximize scene (hides the sidebar)
+   * - Key ``v``
+     - Toggle minimalistic view option
+   * - Key ``c``
+     - Toggle high contrast mode
+   * - Key ``b``
+     - Toggle label visibility
+   * - Key ``d``
+     - Render detector image with the current settings
+   * - Key ``0``
+     - Close all open pyplot plots
+   * - Key ``n``
+     - Randomly re-choose the plotted rays
 
-Inside the scene in the bottom left you can find orientation axes, that display the directions of the cartesian axes in the 3D view. 
+There are orientation axes in the bottom left of the scene
+that display the directions of the cartesian axes in the 3D view. 
 The labels on the handles are clickable and set the camera to the corresponding view.
+
 When an action/tasks is running, you are informed by a status text in the bottom right of the scene.
 
 **Picking and Clicking**
 
-A list of properties for the selected ray is shown when clicking on the ray intersection of ray and surface.
+After clicking a ray intersection on a surface, a list of properties on the selected ray section is displayed.
 The intersection position is also marked with a red crosshair, while the picked ray is highlighted in red.
 Even more properties are shown when using ``Shift + Click``.
 
-Right-clicking inside the scene displays the coordinates of the picked point.
+Right-clicking inside the scene displays the coordinates of the picked position.
 ``Shift + Right Click`` moves the currently selected detector to the picked z-position.
 
 **High Contrast Mode**
 
-By activating the high contrast mode the background becomes white and all geometry elements grey or black.
-This is useful when creating scene views for academic output, as the background color in documents is also white.
+Activate the high contrast mode to make the background white and show all other elements in grayscale.
+This is useful when creating scene views for academic output, as the background color in these documents is also white.
 
 .. figure:: ../images/example_double_gauss.png
   :align: center
   :width: 800
   :class: dark-light
 
-  With :python:`plot_dark_mode` enabled.
+  :ref:`example_double_gauss` example with :python:`high_contrast`-mode enabled.
    
 
 Sidebar
@@ -193,11 +196,9 @@ The sidebar is positioned at the right side of the scene and consists of multipl
    * - Spectrum Tab
      - Settings for the rendering of source or detector light spectrum histograms
    * - Focus Tab
-     - Option View and result output for finding the focus in the optical setup
+     - Focus search settings and results
    * - Custom Tab
-     - Custom UI elements that can be created before running the GUI
-
-The UI elements will be discussed in the following sections.
+     - Custom UI elements be created before running the GUI
 
 .. list-table::
    :class: table-borderless
@@ -235,7 +236,7 @@ The UI elements will be discussed in the following sections.
 Additional Windows
 #######################
 
-Besides the main window, there are additional windows in the interface. 
+There are additional windows in the interface besides the main window. 
 These will be discussed in :numref:`gui_windows`, but a quick overview is provided here:
 
 .. list-table::
@@ -248,11 +249,11 @@ These will be discussed in :numref:`gui_windows`, but a quick overview is provid
      - Access
      - Function
    * - Command Window
-     - button at the bottom of the main tab in the sidebar
-     - command execution and history for controlling the GUI and raytracer
+     - Button in the main tab of the sidebar
+     - Command execution and history for controlling the GUI and raytracer
    * - Property Browser
-     - button at the bottom of the main tab in the sidebar
-     - overview of raytracer, scene and ray properties as well as cardinal points
+     - Button in the main tab of the sidebar
+     - Overview of raytracer, scene and ray properties as well as cardinal points
 
 
 .. _gui_tabs:
@@ -271,25 +272,26 @@ Main Tab
    :widths: 75 100 150 150
    :width: 900px
    
-   * - Property
+   * - UI Property
      - Variable Name / Method
      - Values
      - Description
    * - Rays
      - :attr:`ray_count <optrace.gui.trace_gui.TraceGUI.ray_count>`
-     - :python:`int, 0 - 6000000`
-     - number of rays for raytracing
+     - :python:`int`
+     - number of rays for raytracing (count limited by 
+       :attr:`Raytracer.MAX_RAY_STORAGE_RAM <optrace.tracer.raytracer.Raytracer.MAX_RAY_STORAGE_RAM>`)
    * - Plotting
      - :attr:`plotting_mode <optrace.gui.trace_gui.TraceGUI.plotting_mode>`
      - :python:`'Rays'` or :python:`'Points'`
-     - visulation type of the rays
+     - visualization type of the rays
    * - Coloring
      - :attr:`coloring_mode <optrace.gui.trace_gui.TraceGUI.coloring_mode>`
      - :python:`'Plain', 'Power', 'Wavelength', 'Source', 'Polarization xz', 'Polarization yz', 'Refractive Index'`
-     - Quantity for color mapping
+     - quantity for color mapping
    * - Count
      - :attr:`rays_visible <optrace.gui.trace_gui.TraceGUI.rays_visible>`
-     - :python:`int, 1 - 1000`
+     - :python:`int, 1 - 50000`
      - number of visible rays in the scene
    * - Opacity
      - :attr:`ray_opacity <optrace.gui.trace_gui.TraceGUI.ray_opacity>`
@@ -306,7 +308,7 @@ Main Tab
    * - Maximize Scene
      - :attr:`maximize_scene <optrace.gui.trace_gui.TraceGUI.maximize_scene>`     
      - :python:`True` or :python:`False`
-     - should tool- and side bar be hidden
+     - should the sidebar be hidden
    * - High Contrast Mode
      - :attr:`high_contrast <optrace.gui.trace_gui.TraceGUI.high_contrast>`
      - :python:`True` or :python:`False`
@@ -341,7 +343,7 @@ Image Tab
    :align: left
    :widths: 75 100 150 150
    
-   * - Property
+   * - UI Property
      - Variable Name / Method
      - Values
      - Description
@@ -368,7 +370,7 @@ Image Tab
    * - Pixels_xy
      - :attr:`image_pixels <optrace.gui.trace_gui.TraceGUI.image_pixels>`
      - :python:`int`, one of :attr:`RImage.SIZES <optrace.tracer.image.render_image.RenderImage.SIZES>`
-     - number of pixels in smaller image dimension
+     - number of pixels in the smaller image dimension
    * - Logarithmic Scaling 
      - :attr:`log_image <optrace.gui.trace_gui.TraceGUI.log_image>`
      - :python:`True` or :python:`False`
@@ -412,7 +414,7 @@ Image Tab
    * - Resolution Limit 
      - :attr:`filter_constant <optrace.gui.trace_gui.TraceGUI.filter_constant>`
      - :python:`float, 0.3 - 40`
-     - resolution filter filter constant
+     - filter constant of the resolution limit filter
 
 Spectrum Tab
 #######################
@@ -421,7 +423,7 @@ Spectrum Tab
    :header-rows: 1
    :align: left
    
-   * - Property
+   * - UI Property
      - Variable Name / Method
      - Values
      - Description
@@ -461,7 +463,7 @@ Focus Tab
    :header-rows: 1
    :align: left
    
-   * - Property
+   * - UI Property
      - Variable Name / Method
      - Values
      - Description
@@ -498,13 +500,16 @@ Focus Tab
      - 
      - output for displaying optimization information
 
+.. _custom_elements:
+
 Custom Tab
 #######################
 
-optrace allows for the creation of custom UI elements in the "Custom" Tab with bindings to a function.
-Examples using such additional elements include :ref:`example_image_render` or :ref:`example_arizona_eye_model`.
+optrace allows for the creation of custom UI elements in the "Custom" Tab that bind to user-defined functionality.
+Examples using such additional elements include the 
+:ref:`example_image_render` or :ref:`example_arizona_eye_model` scripts.
 
-The elements must be added before running the TraceGUI.
+The elements must be defined and added before running the TraceGUI.
 The following functions are available:
 
 .. list-table::
@@ -531,12 +536,14 @@ The following functions are available:
      - title (:python:`str`), default state (:python:`bool`), callable function
      - a checkbox boolean option
 
-Changing the value, selection or checkbox automatically calls the function after enter has been pressed.
+Changing the selection, checking the check box, or pressing the button automatically runs the underlying action. 
+For a value field, the value is confirmed through either the loss of focus of the UI element or by pressing enter.
 The number of custom UI elements is limited to three of each type.
-The callable functions are an optional parameter (except for the button), which can be left empty of set to :python:`None`.
+The callable functions are an optional parameter (except for the button),
+which can be left empty or set to :python:`None`.
 This can be useful when using a field as setting for another action.
 
-The following examples creates a custom button, checkbox, selection and value:
+The following example creates a custom button, checkbox, selection and value:
 
 .. testcode::
 
@@ -581,7 +588,7 @@ ____________________
 Property Viewer
 #######################
 
-The property viewer provides an interactive tree view to the following properties:
+The property viewer provides an interactive tree view of:
 
 * properties about the rays/points currently shown
 * cardinal points and other paraxial properties of the lenses and the whole lens setup
@@ -589,8 +596,9 @@ The property viewer provides an interactive tree view to the following propertie
 * available presets
 * |TraceGUI| properties
 * |TraceGUI| scene properties
+* |TraceGUI| scene actor properties
 
-All displayed property values are a read-only snapshot.
+All displayed property values are read-only snapshots.
 To update the values, click on the ``Update`` button.
 Navigate the tabs to switch to different trees.
 
@@ -602,19 +610,19 @@ Navigate the tabs to switch to different trees.
 Command Window
 #######################
 
-Inside this window commands can run from inside the |TraceGUI| class.
-Scripting on the GUI or change |Raytracer| properties is possible, like adding, changing or removing geometries.
+Inside this window, commands can be defined and executed from inside the scope of the |TraceGUI| class.
+This allows for the scripting on the GUI and |Raytracer| at runtime, including adding, changing or removing geometries.
 
-After entering a command in the upper text field the ``Run``-button needs to be pressed.
-Note that the command is only run, if the GUI is idle, therefore not doing any other tasks.
+After entering a command in the upper text field, the ``Run``-button needs to be pressed.
+Note that the command is only run, if the GUI is idle and not doing any other tasks.
 
 After running the command, the scene is automatically updated and the geometry is retraced if the option 
-"Retrace and replot automatically" is set.
-This can also be done manually with th ``Replot/Retrace`` Button.
+*"Retrace and replot automatically"* is set.
+This can also be done manually with the ``Replot/Retrace`` Button.
 
-The command is added to the history in the lower part of the window.
+The command is added to the history list in the lower part of the window.
 Copy each history field with ``Ctrl+C`` or export the whole history by pressing ``Copy History to Clipboard``.
-There is also a ``Clear`` button available that empties the history.
+There is also a ``Clear`` button available that empties the entire history.
 
 
 .. figure:: ../images/ui_command_window.png
@@ -622,11 +630,10 @@ There is also a ``Clear`` button available that empties the history.
    :width: 600
    :class: dark-light
 
-The commands are run from within the TraceGUI object.
-To avoid race conditions and issues with scene rendering, all actions are run sequential.
+All actions are run sequential to avoid race conditions and issues with scene rendering.
 This leads to the UI being unresponsive while running the command.
 
-There are multiple object aliases available to simplify coding inside the command window
+There are multiple object aliases to simplify coding inside the command window:
 
 .. list-table:: Some object aliases
    :header-rows: 1
@@ -659,8 +666,7 @@ There are multiple object aliases available to simplify coding inside the comman
    * - :python:`VL`
      - the volume list of the raytracer
 
-For instance, inside the command window you can write :python:`RT.remove(AL[1])`
-to remove the second aperture of tracing geometry.
+For instance, you can write :python:`RT.remove(AL[1])` to remove the second aperture of tracing geometry.
 By default, you also have access to most optrace classes, e.g. :python:`Raytracer, RGBImage, Group, RingSurface, ...`.
 
 To include custom objects in the class, you can simply pass them to the constructor:
@@ -674,7 +680,7 @@ To include custom objects in the class, you can simply pass them to the construc
 
    sim = TraceGUI(RT, important_function=func, important_variable=var)
 
-This also makes them available for usage in the command window as 
+This also makes them available for usage inside the command window as 
 :python:`GUI.important_function(), GUI.important_variable, ...`.
 
 

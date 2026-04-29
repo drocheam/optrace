@@ -436,7 +436,7 @@ from a vector multiplication of the cartesian axis and the base vector.
    :align: center
    :class: dark-light
 
-   Exemplary direction vector :math:`s` inside a cone volume around :math:`s_0`
+   Example direction vector :math:`s` inside a cone volume around :math:`s_0`
 
 With :math:`x = [1, 0, 0]` and :math:`s_0` being the base orientation unity vector for the cone. 
 The vectors :math:`s_x,s_y` are calculated using vector products:

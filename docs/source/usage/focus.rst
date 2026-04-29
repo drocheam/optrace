@@ -22,38 +22,36 @@ Focus Search
 Focus Modes
 ____________________
 
-The following focus methods are available:
+Focus search is available with these four methods:
 
 .. list-table::
    :widths: 300 500
    :align: left
 
-   * - **RMS Spot Size**
+   * - :python:`"RMS Spot Size"`
      - minimal variance of the lateral ray position
-   * - **Irradiance Variance**
+   * - :python:`"Irradiance Variance"`
      - highest irradiance variance
-   * - **Image Sharpness**
-     - sharpest edges for the whole image
-   * - **Image Center Sharpness**
+   * - :python:`"Image Sharpness"`
+     - sharpest edges of the full image
+   * - :python:`"Image Center Sharpness"`
      - sharpest edges in the center region of the image
 
-The methods use all available rays, for better results the scene should have been traced with much rays as possible.
-The methods are explained in more detail down below.
-
-There are multiple applications for focus search, below you can find method recommendations.
+These methods utilize all available rays, so tracing the scene with a larger number of rays is favorable.
+Detailed descriptions of these methods are found below.
+Focus search methods should be chosen according to the simulation and geometry scenario:
 
 **Case 1**: Perfect, nearly ideal focal point
- * **Examples:** Focus of an ideal lens. Paraxial illumination of a real lens
+ * **Examples:** Focus of an ideal lens. Paraxial illumination of a real lens.
  * **Preferred methods:** RMS Spot Size. Irradiance Variance is also suitable, but has worse performance.
 
-Below you can find an example.
-Both RMS Spot Size and Irradiance Variance find a similar focal position, differing only in 70 µm.
+In the below example, both RMS Spot Size and Irradiance Variance find a similar focal position, differing only in 70 µm.
 Note the different scaling of the images.
 
 .. list-table::
    Comparison between "RMS Spot Size" (left) and "Irradiance Variance" (right) in linear (top) and logarithmic
    lightness values (bottom).
-   Example :ref:`example_double_gauss`. Focus search for ray source 0 only. 2 million rays.
+   Example file: :ref:`example_double_gauss`. Focus search on ray source 0 only. 2 million rays.
    :class: table-borderless
 
    * - .. figure:: ../images/focus_gauss_rms.webp
@@ -67,19 +65,20 @@ Note the different scaling of the images.
           :class: dark-light
 
 **Case 2:**  Strong aberrations or no distinct focal point
- * **Examples:** Lens with large spherical aberration, multifocal lens
+ * **Examples:** Lens with large amounts of spherical aberration, multifocal lens
  * **Preferred methods:** Irradiance Variance.
 
-In the following example there are noticeable amounts of spherical aberration.
-RMS Spot Size tries the minimize the radial distance of the outer rays, sacrificing a sharp core.
+The following example showcases a setup with noticeable amounts of spherical aberration.
+The method RMS Spot Size tries the minimize the radial distance of the outer rays, while also sacrificing a sharp core.
 Irradiance Variance correctly finds a suitable focal position.
-Note the logarithmic plots, that show the outer rays.
-In the right case they merely contribute to the image, but they have large impact on the RMS, why the RMS method fails.
+In the logarithmic plots below, the outer rays are more discernible.
+While they merely contribute in the right image, they severely raise the RMS-value, 
+preventing the RMS to choose this actually superior solution.
 
 .. list-table::
    Comparison between "RMS Spot Size" (left) and "Irradiance Variance" (right) in linear (top) and logarithmic 
    lightness values (bottom).
-   Example :ref:`example_spherical_aberration`.
+   Rendered in the example geometry :ref:`example_spherical_aberration`.
    :class: table-borderless
 
    * - .. figure:: ../images/focus_sphere_rms.webp
@@ -103,21 +102,22 @@ In the right case they merely contribute to the image, but they have large impac
           :class: dark-light
 
 **Case 3:** Finding the optimal image distance
- * **Example:** Actual image position (not just the paraxial) in a multi-lens setup.
+ * **Example:** Actual best image position (not just the paraxial) in a multi-lens setup.
  * **Preferred methods:** Image Sharpness. 
-   With large amounts of curvature of field Image Center Sharpness should be selected, 
-   to find a best-fit focus for the image center region.
+   With large amounts of curvature of field *Image Center Sharpness* should be selected instead, 
+   to find a best-fit focus for the center region.
 
-For the image sharpness methods to work best, a source image with high contrast and sharp edges should be used.
-For instance, the grid or Siemens star presets, depicted in table :numref:`table_image_presets_aberrations`.
+For best results, a target with high contrast and sharp edges should be set as source image.
+Examples include the Siemens star or the grid preset, 
+the latter is depicted in table :numref:`table_image_presets_aberrations`.
 
-In the following figure you can find an example for image sharpness focussing for a setup with 
-large amounts of field of curvature. While in the left case more image regions are somewhat sharp, in the right case 
-the sharpness is optimized for the center region.
+The following two figures demonstrate the Image Sharpness focussing for a setup with distinct field of curvature.
+While the left part shows a best-focus fit for the whole image, the right part was optimized for the image center.
 
 .. list-table::
    Comparison between "Image Sharpness" (left) and "Image Center Sharpness" (right) for a setup with 
-   large amounts of field of curvature. Example :ref:`example_image_render`, Grid image, pupil of 1mm, 5 million rays.
+   large amounts of field of curvature. Example :ref:`example_image_render` with a grid image selected, 
+   a pupil of 1mm and 5 million rays simulated.
    :class: table-borderless
 
    * - .. figure:: ../images/focus_image_sharpness_grid.webp
@@ -134,35 +134,35 @@ the sharpness is optimized for the center region.
 Limitations
 __________________
 
-Limitations include:
+Limitations of the focus search include:
 
-* due to restrictions of the search region the search can't find a focus that lies between the maximum and minimum
-  z-value of a surface
-* rays absorbed in the search region by the raytracer outline are handled as not absorbed
-* in more complex cases only a local minimum is found
-* see the limitations of each method below. 
+* due to restrictions on the search region, foci inside a surface (between minimum and maximum z-value of a surface) 
+  can't be found
+* absorptions at the raytracer outline are not handled, when they occur inside the search region. 
+  This region reaches from the last to next surface in z-direction
+* in more complex cases, only a local minimum is found, but not the global one
+* see the limitations of each method below 
 
 Usage
 ______________
 
-
-For focus search you will need to trace the :class:`Raytracer <optrace.tracer.raytracer.Raytracer>` geometry.
-The :meth:`focus_search <optrace.tracer.raytracer.Raytracer.focus_search>` function is then called by 
-passing the focus mode and a starting position. 
-The search takes place around the starting point, with the search region between the largest z-position of the last
-aperture, filter, lens or ray source and the smallest z-position of the next aperture, filter, lens or outline.
+The :meth:`focus_search <optrace.tracer.raytracer.Raytracer.focus_search>` method
+takes the focus mode and a starting position as parameters. 
+With this starting position, the search region is defined as axial maximum z-position 
+of the last surface in negative z-direction to the axial minimum of the next position in z-direction.
+This includes surfaces from ray sources, lenses, filters, apertures as well as the outline planes.
+Before focus search, the :class:`Raytracer <optrace.tracer.raytracer.Raytracer>` geometry needs to be traced first.
 
 
 .. testcode::
 
    res, fsdict = RT.focus_search("RMS Spot Size", 12.09)
 
-:python:`focus_search` returns two results, where the first one is a :class:`scipy.optimize.OptimizeResult` 
-object with information on the root finding. The found z-position is accessed with :python:`res.x`.
-The second return value includes some additional information, for instance needed for the cost plot, 
-see :ref:`focus_cost_plot`.
+This function returns a two-element tuple, where the first one is a :class:`scipy.optimize.OptimizeResult` 
+with information on the root finding. The found z-position is accessed with :python:`res.x`.
+The second return value includes some additional information required for the :ref:`focus_cost_plot`.
 
-By default, rays from all sources are used to focus_search.
+By default, the focus search includes rays from all sources.
 Optionally a :python:`source_index` parameter can be provided to limit the search to a specific ray source.
 
 .. testcode::
@@ -176,68 +176,62 @@ the parameter :python:`return_cost` must be set to :python:`True`:
 
    res, fsdict = RT.focus_search("RMS Spot Size", 12.09, return_cost=True)
 
-This is required when plotting the cost function using 
+This is required for plotting the cost function using 
 :meth:`focus_search_cost_plot <optrace.plots.misc_plots.focus_search_cost_plot>`, see :ref:`focus_cost_plot`.
 It is deactivated by default to increase the performance of methods :python:`"RMS Spot Size", "Irradiance Variance"` 
 
-Cost Plot
-_________________
+Cost Function Plot
+______________________
 
-.. note::
-
-   Generally it is recommended to plot the cost function of the optimization so one can see 
-   if there are multiple minima and how distinct the found value is.
-   The TraceGUI has an option for plotting the cost function.
-
-See :ref:`focus_cost_plot`.
+Checking if the optimization found a suitable optimum is done with :ref:`focus_cost_plot`.
 
 
-Mathematical Formulations
+Cost Function Details
 _______________________________________
 
 RMS Spot Size
 =========================================
 
-Minimizing the position variance :math:`\sigma^2` of lateral ray positions :math:`x` 
-and :math:`y` at axial position :math:`z`.  All positions are weighted with their power :math:`P` 
+This function minimizes the position variance :math:`\sigma^2` of lateral ray positions :math:`x` 
+and :math:`y` at axial position :math:`z`.  All positions are weighted according to their power :math:`P` 
 when calculating the weighted variance :math:`\sigma^2_P`. 
-The Pythagorean sum is applied using both variances to get a simple quantity :math:`R_\text{v}` for optimization.
+The Pythagorean sum is applied for a simple quantity :math:`R_\text{v}` for optimization.
 
 .. math::
    \underset{z \in [z_0, z_1]}{\text{minimize}}~~ R_\text{v}(z) := \sqrt{\sigma^2_{x,P}(z) + \sigma^2_{y,P}(z)}
    :label: autofocus_position
 
-This procedure is simple and performant. 
-However, the disadvantage of this method is that it minimizes the position variance of all beams. 
-For example, if there is a strong outlying halo, the method also tries to keep it as small as possible, 
-which can lead to a compromise between the halo and the size of the actual focus.
+This procedure is simple to implement and performant. 
+However, minimizing the overall position variance is disadvantageous in many cases: 
+For example, for an outlying halo, the method also tries to minimize the spread of these outer rays, 
+which leads to a compromise between the halo and actual focus size.
 
 
 Irradiance Variance
 =====================
 
-Renders a two dimensional power histogram :math:`P(x, y, z)` for rays at position :math:`z`. 
-This image is divided by pixel area to get an irradiance image :math:`E(x, y, z)`.
-The approach then calculates the variance of the pixel values and finds the :math:`z` with the largest variance.
+The mode Irradiance Variance renders a two dimensional power histogram :math:`P(x, y, z)` 
+for rays at position :math:`z`. 
+Dividing each pixel by its area generates an irradiance image :math:`E(x, y, z)`.
+This method then calculates the variance of these values and locates the position :math:`z` with the largest variance.
 
 .. math::
    \underset{z \in [z_0, z_1]}{\text{maximize}}~~ \log{\sigma_E^2(z)}
    :label: autofocus_image
 
-The logarithm is applied for a more compact value range.
+Applying the logarithm leads to a more compact and stable value range of the cost function.
 
-The most outside rays define the image dimensions, the absolute image size therefore varies along the beam path. 
-This can be an issue when few rays are far away from the optical axis, 
-since the resolution suffers because of these marginal rays.
+The variance increase for low entropy images (= defined details) and for images with high irradiance (= power/area).
 
-The variance is large when there are bright areas in the image (with much power per area)
-or if there is a large variance between pixels, which should be the case if unblurred structures are present.
-
+The image dimensions are defined by the outermost rays, the absolute image size therefore varies along the beam path.
+This can lead to issues with marginal rays far from the optical axis, 
+as these rays increase the pixel size for a specified fixed pixel count.
 
 Image Sharpness
 ==================
 
-As for the method Irradiance Variance, a power histogram is calculated.
+For this method, a power histogram is calculated in the same manner, 
+but the pixel values are not normalized by their area.
 The method then maximizes all image gradients, which indicate sharp structures and a high local variance.
 The magnitude of the gradient is calculated from the Pythagorean sum of its components.
 Maximizing the sum of all squared magnitudes leads to the following expression:
@@ -256,18 +250,13 @@ This is equivalent to:
 Image Center Sharpness
 ========================
 
-The same procedure is performed as for the Image Sharpness method, 
-but the image is weighted with a rotationally symmetric Hanning window:
+Compared to the Image Sharpness method, 
+the image is weighted with a rotationally symmetric Hanning window:
 
 .. math::
    P_w(x, y, z) = P(x, y, z) \cdot \begin{cases} 1 + \cos(\pi r) &~~\text{for}~ r \leq 1\\ 0 & ~~\text{for}~ r > 1\\ \end{cases}
    :label: autofocus_image_center_sharpness
 
 Here, :math:`r` is calculated from the normalized image coordinates :math:`x, y \in [-1, 1]`.
-
-After weighing the image, its power is normalized.
-This is done to avoid rewarding images with more light intensity at their center,
-as the linearity of scaling also leads to higher partial derivatives.
-This is equivalent to optimizing the ratio of sum of derivatives and image intensities.
-In the Image Sharpness method this is not required, as the power remains constant in each image,
-as all rays are included equally.
+As moving gradients towards regions with higher weights also increases :math:`P_w`,
+the windowed image power is normalized first to avoid rewarding images with more central image components.

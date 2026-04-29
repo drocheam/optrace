@@ -24,6 +24,7 @@ Image Classes
 Overview
 ______________
 
+The available image classes are:
 
 .. list-table::
    :widths: 300 900
@@ -47,7 +48,7 @@ ______________
      - | Raytracer created image that holds raw XYZ colorspace and power data. 
        | This object allows for the creation of |RGBImage| and |ScalarImage| objects.
 
-For both |RGBImage| and |GrayscaleImage| the pixel values don't correspond the physical intensities,
+For both |RGBImage| and |GrayscaleImage|, the pixel values don't correspond to physical intensities,
 but non-linearly scaled values for human perception.
 
 
@@ -56,13 +57,13 @@ _________________________________________________________
 
 
 |ScalarImage|, |GrayscaleImage| and |RGBImage| require a data argument and a geometry argument.
-The latter can be either provided as side length list :python:`s` or a positional :python:`extent` parameter.
+The latter can be provided as either a side length list :python:`s` or a positional :python:`extent` parameter.
 
 :python:`s` is a two element list describing the side lengths of the image. 
 The first element gives the length in x-direction, the second in y-direction.
 The image is automatically centered at :python:`x=0` and :python:`y=0`
 
-Alternatively the edge positions are described using the :python:`extent` parameter.
+Alternatively, the edge positions are described using the :python:`extent` parameter.
 It defines the x- and y- position of the edges as four element list.
 For instance, :python:`extent=[-1, 2, 3, 5]` describes that the geometry of the image reaches from :python:`x=-1`
 to :python:`x=2` and :python:`y=3` to :python:`y=5`.
@@ -71,7 +72,7 @@ The data argument must be a numpy array with either two dimensions (|ScalarImage
 or three dimensions (|RGBImage|). In both cases, the data should be non-negative and in the case of |RGBImage|
 and |GrayscaleImage| lie inside the value range of :python:`[0, 1]`.
 
-The following example creates a random |GrayscaleImage| using a numpy array and the :python:`s` argument:
+The following example creates a random |GrayscaleImage|:
 
 .. testcode::
   
@@ -82,7 +83,7 @@ The following example creates a random |GrayscaleImage| using a numpy array and 
    img = ot.GrayscaleImage(img_data, s=[0.1, 0.08])
 
 
-While a random, spatially offset |RGBImage| is created with:
+A random, spatially offset |RGBImage| is created with:
 
 .. testcode::
   
@@ -93,22 +94,18 @@ While a random, spatially offset |RGBImage| is created with:
    img = ot.RGBImage(img_data, extent=[-0.2, 0.3, 0.08, 0.15])
 
 
-It is also possible to load image files.
-For this, the data is specified as relative or absolute path string:
+Loading images (|RGBImage|, |GrayscaleImage| or |ScalarImage|) is implemented 
+by providing a path string instead of an array:
 
 .. code-block:: python
 
    img = ot.RGBImage("image_file.png", extent=[-0.2, 0.3, 0.08, 0.15])
 
-
-Loading a |GrayscaleImage| or |ScalarImage| is also possible.
-However, in the case of a three channel image file, there can't be any significant coloring.
-An exception gets thrown in that case.
-If this is the case, either remove color information or convert it to an achromatic color space.
-
+For the grayscale image types, an exception is raised when there is significant coloring in the input image.
+Remove the color information or convert it to an achromatic color space to use it as grayscale input.
 
 |RGBImage| and |GrayscaleImage| presets are available in :numref:`image_presets`. 
-For convolution there are multiple PSF |GrayscaleImage| presets, see :numref:`psf_preset_gallery`.
+There are multiple PSF |GrayscaleImage| presets for convolution, see :numref:`psf_preset_gallery`.
 
 .. _rimage_rendering:
 
@@ -118,7 +115,7 @@ _____________________________________
 
 **Example Geometry**
 
-The below snippet generates a geometry with multiple sources and detectors. 
+The code snippet below generates a geometry with multiple sources and detectors. 
 
 .. testcode::
 
@@ -161,45 +158,37 @@ The below snippet generates a geometry with multiple sources and detectors.
 
 Rendering a source image is done with the :meth:`source_image <optrace.tracer.raytracer.Raytracer.source_image>` 
 method of the :class:`Raytracer <optrace.tracer.raytracer.Raytracer>` class. 
-Note that the scene must be traced before.
+Note that the scene must be traced first.
 
-Example:
-
-.. testcode::
-
-   simg = RT.source_image()
-
-This renders an |RenderImage| for the first source.
-The following code renders it for the second source (since index counting starts at zero) and additionally provides 
-the resolution limit :python:`limit` parameter of 3 µm.
+The following code renders an |RenderImage| for the second source:
 
 .. testcode::
 
-   simg = RT.source_image(source_index=0, limit=3)
+   simg = RT.source_image(source_index=1)
 
 
 **Detector Image**
 
-Calculating a :meth:`detector_image <optrace.tracer.raytracer.Raytracer.detector_image>` is done in a similar fashion:
+Calculating a :meth:`detector_image <optrace.tracer.raytracer.Raytracer.detector_image>` is handled similarly:
 
 .. testcode::
 
    dimg = RT.detector_image()
 
-Compared to :meth:`source_image <optrace.tracer.raytracer.Raytracer.source_image>`, you can not only provide a 
-:python:`detector_index`, but also a :python:`source_index`, which limits the rendering to the light from this source. 
-By default all sources are used for image generation.
+:python:`detector_index` (defaulting to 0) specifies the detector for image rendering.
+Without the optional :python:`source_index` parameter, intersecting rays from all sources contribute to the image.
 
 .. testcode::
 
    dimg = RT.detector_image(detector_index=0, source_index=1)
 
-For spherical surface detectors a :python:`projection_method` can be chosen. 
-Moreover, the extent of the detector can be limited with the :python:`extent` parameter, that is provided as 
-:python:`[x0, x1, y0, y1]` with :math:`x_0 < x_1, ~ y_0 < y_1`. 
-By default, the extent gets adjusted automatically to contain all rays hitting the detector.
-The :python:`limit` parameter can also be provided, 
-as for :meth:`source_image <optrace.tracer.raytracer.Raytracer.source_image>`.
+In the case of a spherical detector, 
+a suitable :python:`projection_method` should be chosen (see :numref:`image_sphere_projections`). 
+Moreover, the extent of the detector image can be set with the :python:`extent` parameter, 
+that is provided as :python:`[x0, x1, y0, y1]` with :math:`x_0 < x_1, ~ y_0 < y_1`. 
+By default, the extent is adjusted automatically to contain all rays hitting the detector.
+The :python:`limit` parameter can also be provided for the approximation of diffraction-limited systems 
+(see :numref:`image_airy_filter`).
 
 .. testcode::
 
@@ -212,27 +201,27 @@ as for :meth:`source_image <optrace.tracer.raytracer.Raytracer.source_image>`.
 Iterative Render
 _______________________
 
-When tracing, the amount of rays is limited by the system's available RAM. 
-Many million rays would not fit in the finite working memory.
+With the default tracing operation, all rays are stored in memory.
+This leads to the number of rays being limited by the system's available RAM. 
+A typical PC can only simulate a few million rays without running out of memory.
 
 The function :meth:`iterative_render <optrace.tracer.raytracer.Raytracer.iterative_render>` exists 
 to allow the usage of even more rays.
-It does multiple traces and iteratively adds up the image components to a summed image. 
-In this way there is no upper bound on the ray count. 
-With enough available user time, images can be rendered with many billion rays.
+It does multiple traces and iteratively adds up the resulting images.
+Doing this, there is no upper bound on the ray count.
 
 Parameter :python:`N` provides the overall number of rays for raytracing.
 The returned value of :meth:`iterative_render <optrace.tracer.raytracer.Raytracer.iterative_render>`
 is a list of rendered detector images.
 
 If the detector position parameter :python:`pos` is not provided, 
-a single detector image is rendered at the position of the detector specified by :python:`detector_index`.
+a single detector image is rendered at the detector specified by :python:`detector_index`.
 
 .. testcode::
 
    rimg_list = RT.iterative_render(N=1000000, detector_index=1) 
 
-If :python:`pos` is provided as coordinate, the detector is moved before tracing.
+If :python:`pos` is provided as 3D coordinate, the detector is moved to this position before tracing.
 
 .. testcode::
 
@@ -242,7 +231,7 @@ If :python:`pos` is a list, :python:`len(pos)` detector images are rendered.
 All other parameters are either automatically repeated :python:`len(pos)` times or can be specified 
 as list with the same length as :python:`pos`.
 
-Exemplary calls:
+Example calls include:
 
 .. testcode::
 
@@ -257,7 +246,7 @@ Exemplary calls:
 
 **Tips for Faster Rendering**
 
-With large rendering times, even small speed-up amounts add up significantly:
+With large rendering times, even small speed-ups add up significantly:
 
 * Setting the raytracer option :python:`RT.no_pol` skips the calculation of the light polarization. 
   Note that depending on the geometry the polarization direction can have an influence of the amount 
@@ -265,10 +254,11 @@ With large rendering times, even small speed-up amounts add up significantly:
   if the parameter seems to have any effect on the image.
   Depending on the geometry, :python:`no_pol=True` can lead to a speed-up of 10-40%.
 * Prefer inbuilt surface types to data or function surfaces
-* try to limit the light through the geometry to rays hitting all lenses. For instance:
+* Improve the sequential order of elements or the initial ray distribution. For instance:
     - Moving the color filters to the front of the system avoids the calculation of ray refractions 
       that get absorbed at a later stage.
-    - Orienting the ray direction cone of the source towards the setup, therefore maximizing rays hitting all lenses.
+    - Orienting the ray direction cone of the source towards the setup, 
+      therefore maximizing the number of rays hitting all lenses.
       See the :ref:`example_arizona_eye_model` example on how this could be done. 
 
 Saving and Loading a RenderImage
@@ -278,21 +268,21 @@ ___________________________________________
 **Saving**
 
 A |RenderImage| can be saved on the disk for later use in optrace. 
-This is done with the following command, that takes a file path as argument:
+This is done with the following command that takes a file path as argument:
 
 .. code-block:: python
 
    dimg.save("RImage_12345")
 
-The file ending should be ``.npz``, but gets added automatically otherwise. 
+The file ending should be ``.npz``, but is appended automatically otherwise. 
 This function **overrides files** and throws an exception when saving failed.
 
 
 **Loading**
 
 The static method :meth:`load <optrace.tracer.image.render_image.RenderImage.load>` 
-from the |RenderImage| loads the saved file. 
-It requires a path and returns the |RenderImage| object arguments.
+from the |RenderImage| loads a stored file. 
+It requires a path and returns the |RenderImage| object.
 
 .. code-block:: python
 
@@ -304,12 +294,11 @@ It requires a path and returns the |RenderImage| object arguments.
 Sphere Projections
 ___________________________
 
+Sphere projections are required to display a sphere segment in a planar, rectangular view.
+Note that there is no way to correctly represent angles, distances and areas at the same time. 
 
-With a spherical detector surface, there are multiple ways to project it down to a rectangular surface. 
-Note that there is no possibility to correctly represents angles, distances and areas at the same time. 
-
-Below you can find the projection methods implemented in optrace and links to a more detailed explanation.
-Details on the math applied are found in the math section in :numref:`sphere_projections`.
+Below you can find the implemented projection methods and references to a more detailed explanation.
+Details on the mathematical definition are also found in :numref:`sphere_projections`.
 
 The available methods are:
 
@@ -325,7 +314,7 @@ The available methods are:
      - Conformal projection (preserving local angles and shapes) :footcite:`SteographicProjWiki`
 
    * - :python:`"Equidistant"`
-     - Projection keeping the radial direction from a center point equal :footcite:`EquidistantProjWiki`
+     - Projection keeping the radial direction from a center point equally spaced :footcite:`EquidistantProjWiki`
 
    * - :python:`"Equal-Area"`
      - Area preserving projection :footcite:`EqualAreaProjWiki`
@@ -364,8 +353,8 @@ ___________________________
 
 Unfortunately, optrace does not take wave optics into account when simulating. 
 To estimate the effect of a resolution limit the :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>` 
-class provides a limit parameter. 
-For a given limit value a corresponding Airy disc is created, that is convolved with the image.
+class provides a :python:`limit` parameter. 
+For a given value a corresponding Airy disc is created, that is convolved with the image.
 This parameter describes the Rayleigh limit, being half the size of the Airy disc core (zeroth order), 
 known from the equation:
 
@@ -374,20 +363,20 @@ known from the equation:
 
    r = 0.61 \frac{\lambda}{\text{NA}}
 
-Where :math:`\lambda` is the wavelength and :math:`\text{NA}` is the numerical aperture.
+Here, :math:`\lambda` is the wavelength and :math:`\text{NA}` is the numerical aperture.
 While the limit is wavelength dependent, one fixed value is applied to all wavelengths for simplicity.
-Only the first two diffraction orders (core + 2 rings) are used, higher orders should have a negligible effect.
+Only the first two diffraction orders (core + 2 rings) are used, 
+higher orders should have only a negligible effect on the image.
 
 .. note::
 
-   | The limit parameter is only an estimation of how large the impact of a resolution limit on the image is.
-   | The simulation neither knows the actual limit nor takes into interference and diffraction.
+   The limit parameter is only an estimation of how large the impact of a resolution limit on the image should be.
+   The simulation neither knows the actual limit nor takes into interference and diffraction.
 
 
 .. list-table:: Images of the focus in the :ref:`example_achromat` example. From left to right: 
-   No filter, filter with 1 µm size, filter with 5 µm size. 
-   For a setup with a resolution limit of 5 µm we are clearly inside the limit, 
-   but even for 1 µm we are diffraction limited.   
+   No filter, filter with 1 µm size, filter with 5 µm size.
+   The setup seems to be diffraction limited for both parameter cases.
    :class: table-borderless
 
    * - .. figure:: ../images/rimage_limit_off.webp
@@ -405,9 +394,9 @@ Only the first two diffraction orders (core + 2 rings) are used, higher orders s
           :class: dark-light
           :width: 340
 
-The limit parameter can be applied while either creating the |RenderImage| (:python:`ot.RenderImage(..., limit=5)`) 
-or by providing it to methods the create an |RenderImage| (:python:`Raytracer.detector_image(..., limit=1)`, 
-:python:`Raytracer.iterative_render(..., limit=2.5)`.
+.. The limit parameter can be applied while either creating the |RenderImage| (:python:`ot.RenderImage(..., limit=5)`) 
+.. or by providing it to methods the create an |RenderImage| (:python:`Raytracer.detector_image(..., limit=1)`, 
+.. :python:`Raytracer.iterative_render(..., limit=2.5)`.
 
 
 Generating Images from RenderImage
@@ -415,8 +404,8 @@ _____________________________________
 
 **Usage**
 
-From a |RenderImage| multiple image modes can be generated with the 
-:meth:`get <optrace.tracer.image.render_image.RenderImage.get>` method.
+Displayable image types are generated using the 
+:meth:`RenderImage.get <optrace.tracer.image.render_image.RenderImage.get>` method.
 The function takes an optional pixel size parameter, that determines the pixel count for the smaller image size.
 Internally the :class:`RenderImage <optrace.tracer.image.render_image.RenderImage>` stores its data with a 
 pixel count of 945 for the smaller side, while the larger side is either 1, 3 or 5 times this size, 
@@ -428,37 +417,37 @@ To only join full bins, the available sizes are reduced to:
    >>> ot.RenderImage.SIZES
    [1, 3, 5, 7, 9, 15, 21, 27, 35, 45, 63, 105, 135, 189, 315, 945]
 
-As can be seen, all sizes are integer factors of 945.
+As can be seen, all sizes are integer factors contained in 945.
 All sizes are odd, so there is always a pixel/line/row for the image center.
-Without a center pixel/line/row the center position would be badly defined, either being offset 
-or jumping around depending on numerical errors.
+Without a center pixel/line/row the center position would be ill-defined.
 
-In the function :meth:`get <optrace.tracer.image.render_image.RenderImage.get>` the nearest value from 
+In the function :meth:`get <optrace.tracer.image.render_image.RenderImage.get>`, the nearest value from 
 :attr:`RenderImage.SIZES <optrace.tracer.image.render_image.RenderImage.SIZES>` to the user selected value is chosen.
 Let us assume the :python:`dimg` has a side length of :python:`s=[1, 2.63]`, 
-so it was rendered in a resolution of 945x2835. This is the case because the nearest side factor to 2.63 is 3 and
+which will be rendered in a resolution of 945x2835 internally. 
+This is the case because the nearest side factor to 2.63 is 3 and
 because 945 is the size for all internally rendered images.
-From this resolution the image can be scaled to 315x945 189x567 135x405 105x315 63x189 45x135 35x105 27x81 21x63 15x45
-9x27 7x21 5x15 3x9 1x3.
-The user image is then scaled into size 315x945, as it is the nearest to a size of 500.
+From this resolution, the image can be scaled to 315x945, 189x567, 135x405, 105x315, 63x189, 45x135, 35x105, 27x81, 
+21x63, 15x45, 9x27, 7x21, 5x15, 3x9, 1x3.
+For a user-chosen size of 500, the nearest size is 315x945.
 
-These restricted pixel sizes lead to typically non-square pixels.
-But these are handled correctly by plotting and processing functions.
+These restricted pixel sizes lead to non-square pixel areas.
+But these are handled correctly by the plotting and processing functions in optrace.
 They will only become relevant when exporting the image to an image file, where the pixels must be square. 
-More details are available in section :numref:`image_saving`.
+More details for this are available in section :numref:`image_saving`.
 
 To get a Illuminance image with 315 pixels we can write:
 
 .. testcode::
 
-   img = dimg.get("Illuminance", 500)
+   img = dimg.get("Illuminance", 315)
 
 Only for image modes :python:`"sRGB (Perceptual RI)"` and :python:`"sRGB (Absolute RI)"` the returned object type 
 is :class:`RGBImage <optrace.tracer.image.rgb_image.RGBImage>` .
 For all other modes it is of type :class:`ScalarImage <optrace.tracer.image.scalar_image.ScalarImage>`.
 
-For mode :python:`"sRGB (Perceptual RI)"` there are two optional additional parameters :python:`L_th` 
-and :python:`chroma_scale`. See :numref:`usage_color` for more details.
+For mode :python:`"sRGB (Perceptual RI)"`, there are two optional additional parameters :python:`L_th` 
+and :python:`chroma_scale`. See :numref:`usage_color` for more details on them.
 
 
 **Image Modes**
@@ -470,9 +459,9 @@ and :python:`chroma_scale`. See :numref:`usage_color` for more details.
    :stub-columns: 1
 
    * - :python:`"Irradiance"`
-     - Image of power per area
+     - Power per area
    * - :python:`"Illuminance"`
-     - Image of luminous power per area
+     - Luminous power per area
    * - :python:`"sRGB (Absolute RI)"`
      - A human vision approximation of the image. Colors outside the gamut are chroma-clipped. 
        Preferred sRGB-Mode for "natural"/"everyday" scenes.
@@ -480,9 +469,9 @@ and :python:`chroma_scale`. See :numref:`usage_color` for more details.
      - Similar to sRGB (Absolute RI), but with uniform chroma-scaling. 
        Preferred mode for scenes with monochromatic sources or highly dispersive optics.
    * - :python:`"Outside sRGB Gamut"`
-     - Pixels outside the sRGB gamut are shown in white
+     - Masks for out-of-gamut colors, with white indicating colors outside the gamut
    * - :python:`"Lightness (CIELUV)"`
-     - Human vision approximation in greyscale colors. Similar to Illuminance, but with non-linear brightness function.
+     - Human vision approximation in grayscale colors. Similar to Illuminance, but with non-linear brightness function.
    * - :python:`"Hue (CIELUV)"`
      - Hue image from the CIELUV colorspace
    * - :python:`"Chroma (CIELUV)"`
@@ -496,9 +485,7 @@ The difference between chroma and saturation is more thoroughly explained in :fo
 An example for the difference of both sRGB modes is seen in :numref:`color_dispersive1`. 
 
 
-.. list-table:: Renderes images from the :ref:`example_image_render` example. From left to right, 
-   top to bottom: sRGB (Absolute RI), sRGB (Perceptual RI), Outside sRGB Gamut, 
-   Lightness, Irradiance, Illuminance, Hue, Chroma, Saturation.
+.. list-table:: Renderes images from the :ref:`example_image_render` example with different modes. 
    :class: table-borderless
 
    * - .. figure:: ../images/rgb_render_srgb1.webp
@@ -569,10 +556,10 @@ Converting between GrayscaleImage and RGBImage
 ___________________________________________________
 
 Use :meth:`RGBImage.to_grayscale_image() <optrace.tracer.image.rgb_image.RGBImage.to_grayscale_image>` to convert a
-colored |RGBImage| to a grayscale image. 
+colored |RGBImage| to a |GrayscaleImage|. 
 The channels are weighted according to their luminance, see question 9 of :footcite:`Poynton_1997`.
 Use :meth:`GrayscaleImage.to_rgb_image() <optrace.tracer.image.grayscale_image.GrayscaleImage.to_rgb_image>` 
-to convert a |GrayscaleImage| to an RGB image. All grayscale values are repeated for the R, G, B channels.
+to convert a |GrayscaleImage| to an |RGBImage|. All grayscale values are repeated for the R, G, B channels.
 Both methods require no parameters and return the other image object type.
 
 Image Profile
@@ -594,8 +581,9 @@ For a profile in x-direction we can write:
 
    bins, vals = img.profile(y=0.25)
 
-The function returns a tuple of the histogram bin edges and the histogram values, both one dimensional numpy arrays.
-Note that the bin array is larger by one element.
+The function returns the histogram bin edges and a list of profiles.
+The latter consists of either a single numpy array (scalar images) or the R, G, B channel profiles (colored images).
+Note that the bin edge array is larger than the profile arrays by one element.
 
 
 .. _image_saving:
@@ -604,7 +592,7 @@ Saving Images
 ___________________________________________
 
 
-|ScalarImage| and |RGBImage| can be saved to disk in the following way:
+|ScalarImage|, |GrayscaleImage| and |RGBImage| can be saved to disk in the following way:
 
 .. code-block:: python
 
@@ -612,15 +600,14 @@ ___________________________________________
 
 The file type is automatically determined from the file ending in the path string.
 
-Often times the image is flipped, but it can be flipped using :python:`flip=True`. 
-This rotates the image by 180 degrees.
+The saved image can be rotated by 180 degrees using :python:`flip=True`:
 
 .. code-block:: python
 
    img.save("image_render_srgb.jpg", flip=True)
 
 
-Depending on the file type ,there can be additional saving parameters provided, for instance compression settings:
+Depending on the file type, additional parameter combinations exists, for instance compression settings:
 
 .. code-block:: python
 
@@ -636,11 +623,11 @@ as the |RGBImage| or |ScalarImage| object.
 
 .. note::
 
-   While the Image has arbitrary, generally non-square pixels, for the export the image is 
+   While the Image has arbitrary, generally non-square pixels, the export image needs to be 
    rescaled to have square pixels. However, in many cases there is no exact ratio that matches the side ratio with 
-   integer pixel counts. For instance, an image with sides 12.532 x 3.159 mm and a desired export size of 105 pixels 
-   for the smaller side leads to an image of 417 x 105 pixels. This matches the ratio approximately, 
-   but is still off by -0.46 pixels (around -13.7 µm). This error gets larger the smaller the resolution is.
+   integer pixel counts. For instance, an image with sides 12.532 mm x 3.159 mm and a desired export size of 105 pixels 
+   (smaller side) leads to an image of 417 pixels x 105 pixels. This matches the ratio approximately, 
+   but is still off by -0.46 pixels (around -13.7 µm). This error grows for smaller pixel counts.
 
 Plotting Images
 _________________
@@ -653,24 +640,27 @@ ________________________
 
 **Overview**
 
-Classes |ScalarImage|, |RenderImage|, |RGBImage| share property methods.
-These include geometry information and metadata.
+The image classes share property methods such as geometry information and metadata.
 When a |ScalarImage| or |RGBImage| is created from a |RenderImage|, the metadata and geometry
 is automatically propagated into the new object.
 
 **Size Properties**
+
+Extent:
 
 .. doctest::
 
    >>> dimg.extent
    array([-0.0081,  1.0081, -0.0081,  1.0081])
 
+Side length:
+
 .. doctest::
 
    >>> dimg.s[1]
    1.0162
 
-The data shape:
+Internal data shape:
 
 .. doctest::
 
@@ -678,7 +668,7 @@ The data shape:
    (945, 945, 4)
 
 
-:python:`Apx` is the area per pixel in mm²:
+Area per pixel in mm²:
 
 .. doctest::
 
@@ -725,8 +715,7 @@ Power in W and luminous power in lm:
 Image Presets
 ____________________
 
-
-Below you can find different images presets.
+Below you can find different image presets.
 As for the image classes, a specification of either the :python:`s` or :python:`extent` geometry parameter is
 mandatory.
 One possible call could be:

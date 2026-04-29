@@ -194,7 +194,7 @@ class Element(BaseClass):
 
     def rotate(self, angle: float) -> None:
         """
-        rotate the object around the z-axis
+        rotate the object around its center in the xy-plane
         :param angle: rotation angle in degrees
         """
         
