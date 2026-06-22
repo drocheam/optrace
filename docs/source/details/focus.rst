@@ -13,7 +13,7 @@ Focus Methods
 Procedure
 =============================
 
-The focus search procedure is illustrated in the subsequent flowchart.
+The focus search procedure is shown in the Figure below.
 
 .. figure:: ../images/FocusPAP.svg
    :width: 400
@@ -30,7 +30,7 @@ RMS Spot Size
 
 An analytical solution exists for the RMS spot size method. 
 The following derivation closely follows :footcite:`Boussemaere_2023_19`.
-For a ray section starting at :math:`x_i, y_i, z_0` the position at additional axial distance :math:`t` is given by:
+For a ray section starting at :math:`x_i, y_i, z_0`, the position at an axial displacement :math:`t` is given by:
 
 .. math::
    x_i^*&=x_i+\frac{s_{x, i}}{s_{z, i}} t \\
@@ -40,7 +40,7 @@ For a ray section starting at :math:`x_i, y_i, z_0` the position at additional a
 We can define the RMS spot size relative to the center coordinates :math:`x_c^*, y_c^*`. 
 This average position also propagates along the optical axis, 
 originating from :math:`x_c, y_c` and with direction vector :math:`s_c`.
-Next, the cost function is defined as:
+Next, the merit function is defined as:
 
 .. math::
    R_v(d) &=\sqrt{\frac{1}{N} \sum_{i=1}^N\left(\left(x_i^*-x_c^*\right)^2+\left(y_i^*-y_c^*\right)^2\right)} \\
@@ -58,7 +58,7 @@ and the relative direction :math:`\Delta \theta_{x,i}, \Delta \theta_{y,i}`:
    \Delta \theta_{y, i} & =\frac{s_{y, i}}{s_{z, i}}-\frac{s_{y, c}}{s_{z, c}}
    :label: eq_rms_spot_size_relative_coordinates
 
-Applying variational calculus results in :footcite:`Boussemaere_2023_19`:
+Applying variational calculus to minimize this function results in :footcite:`Boussemaere_2023_19`:
 
 .. math::
    t_\text{RMS} = -\frac{\sum_{i=1}^N \left(\Delta \theta_{x, i} \Delta x_i+\Delta \theta_{y, i} \Delta y_i \right)}
@@ -69,7 +69,7 @@ Thus, the focal position is located at :math:`z_0 + t_\text{RMS}`.
 
 **Ray Weighted RMS**
 
-Additional weights :math:`w_i` can be attributed to each ray.
+Additional weights :math:`w_i` can be assigned to each ray.
 By choosing the ray power as weights, the power-weighted RMS spot size is obtained:
 
 .. math::
@@ -77,8 +77,7 @@ By choosing the ray power as weights, the power-weighted RMS spot size is obtain
    +\left(w_i\left(y_i^*-y_c^*\right)\right)^2\right)} \\
    :label: eq_weighted_rms_spot_size_cost_function
 
-The weights :math:`w_i` can be isolated from the rest of the expression, 
-resulting in a factor of :math:`w_i^2` for all terms. This yields a solution of:
+Assigning ray powers as weights :math:`w_i` leads to the following weighted solution:
 
 .. math::
    t = -\frac{\sum_{i=1}^N w_i^2 \left(\Delta \theta_{x, i} \Delta x_i+\Delta \theta_{y, i} \Delta y_i \right)}
@@ -101,12 +100,12 @@ is utilized under the hood for various optimization tasks.
 
 For the *Irradiance Variance* method, the :external:ref:`Nelder-Mead <optimize.minimize-neldermead>` 
 solver is employed directly, without doing additional search iterations or refinements. 
-This choice is motivated on the observation of a typically smooth cost function.
+This choice is motivated on the observation of a typically smooth merit function.
 
 In contrast, for the methods *Image Sharpness* and *Image Center Sharpness*, 
-the cost function tends to be much noisier and may include numerous local minima. 
+the merit function tends to be much noisier and may include numerous local minima. 
 To address this challenge, the search region is initially sampled at multiple points. 
-Subsequently, minimization is initiated relative to the smallest found cost position.
+Subsequently, minimization is initiated relative to the smallest found error position.
 The :external:ref:`COBYLA <optimize.minimize-cobyla>` solver yields satisfactory results in these cases.
 
 Pixel Dimensions for Rendering Methods

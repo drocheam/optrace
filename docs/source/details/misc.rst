@@ -4,14 +4,15 @@ Miscellaneous
 
 .. _index_from_abbe:
 
-Curve from Abbe Number
-============================
+Material Dispersion Modeling from Abbe Number
+=================================================
 
 In most cases only a center refractive index :math:`n_\text{c}` 
-and the Abbe number :math:`V` are provided for a material, but not its full :math:`n(\lambda)`-curve.
+and the Abbe number :math:`V` are provided for a material, but not the functional form :math:`n(\lambda)`.
 To simulate such materials, a wavelength-dependent model needs to be established first. 
 While there are countless potential curves that produce these two parameters, 
-it is expected that real same-parameter-materials only exhibit slight curve variations inside the visible range.
+it is expected that real materials with identical :math:`n_\text{c}`, :math:`V` parameters
+only exhibit slight curve variations inside the visible range.
 
 We assume a simple model of the form:
 
@@ -33,8 +34,8 @@ and the Abbe number equation in :math:numref:`n_from_abbe_base`, one can solve f
 Parameters :math:`V`, :math:`n_\text{c}` and the spectral lines
 :math:`\lambda_\text{s},~\lambda_\text{c},~\lambda_\text{l}` are provided by the user.
 
-TiltedSurface Equation
-============================
+Mathematical Formalism for a TiltedSurface
+==================================================
 
 Given the quantities
 
@@ -61,8 +62,9 @@ yields the following function for a tilted surface for :math:`n_z \neq 0`:
    z(x, y) = z_0 - (x - x_0) \, \frac{n_x}{n_z} - (y- y_0) \, \frac{n_y}{n_z}
    :label: tilted_surface
 
-Flipping and Rotation
-=======================
+
+Flipping and Rotation of Geometrical Elements
+==================================================
 
 Flipping a surface is implemented as a 180-degree rotation around the x-axis.
 This transformation is equivalent to negating its relative shape :math:`z_r` with respect to an offset :math:`z_0` 
@@ -83,17 +85,18 @@ the surface values can be rotated without actually rotating the underlying shape
 
 .. _ring_sampling:
 
-Equal Area Radial Sampling of Ring and Circle
+Circular Equal-Area Sampling
 ==================================================
 
-A differential circular area element can be represented in polar coordinates as:
+A differential circular area element can be represented in polar coordinates as product
+of differential radius :math:`\text{d}r` and differential angle :math:`\text{d}\phi` :
 
 
 .. math::
    \text{d}A = \text{d}r  ~\text{d}\phi
    :label: ring_sampling_area_element
 
-The variable :math:`\text{d}\phi` can be rewritten as a circle segment:
+The angle variable can be rewritten as a circle segment:
 
 .. math::
    \text{d}A = \text{d}r  ~\frac{2 \pi}{N} r
@@ -121,7 +124,8 @@ The solution to this second-order, nonlinear differential equation takes the for
    :label: ring_sampling_area_element_diff_eq_solution
 
 For convenience, we set the constants to :math:`c_1 = 0` and :math:`c_2=1`. 
-To obtain output values in the range :math:`[r_i, ~R]`, the corresponding input values are :math:`[r^2_i, ~R^2]`. 
+To obtain output values in the range :math:`[r_i, ~R]`, with inner ring radius :math:`r_i` and outer radius :math:`R`, 
+the corresponding input values are :math:`[r^2_i, ~R^2]`. 
 By treating :math:`r` and :math:`u` as random variables, we arrive at:
 
 .. math::

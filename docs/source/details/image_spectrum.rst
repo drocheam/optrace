@@ -151,7 +151,7 @@ The number of bins for the histogram is determined by the equation:
 .. math::
    N_\text{b} = 1 + 2 \; \text{floor} \left(\frac{ \text{max}\left( 51, \frac{\sqrt{N}}{2}\right)} {2}\right)
 
-This formula ensures that :math:`N_\text{b}` is odd, thereby providing a well-defined center. 
+This formula ensures that :math:`N_\text{b}` is odd, thereby providing a well-defined center for symmetric ranges. 
 Regardless of the number of rays :math:`N`, the minimum number of bins is fixed at 51, 
 with the count scaling according to the square root of :math:`N` above a certain threshold.
 This scaling is necessary because the Signal-to-Noise Ratio (SNR) of the mean increases proportionally 

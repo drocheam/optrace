@@ -8,7 +8,9 @@ Ray Transfer Matrix Analysis
 ABCD Matrix 
 =================================================
 
-In paraxial optics, the relationships between angles :math:`\theta` and distances :math:`x` 
+The analysis assumes paraxial approximations (:math:`\sin \theta \approx \theta`), 
+where rays remain close to the optical axis.
+With this assumption, the relationships between angles :math:`\theta` and distances :math:`x` 
 relative to the optical axis can be represented as linear operation.
 The so-called ABCD matrix describes a paraxial system and translates 
 the input values to output parameters of this system. 
@@ -38,14 +40,14 @@ This relationship can be represented as: :footcite:`IvanOptics`
    * - Element
      - Description
    * - :math:`A`
-     - positional scaling
+     - transverse magnification
    * - :math:`B`
      - position change depending on input angle
    * - :math:`C`
      - | angle change depending on input position. 
        | Equivalent to :math:`-\frac{1}{f}`, with :math:`f` being the focal distance
    * - :math:`D`
-     - angular scaling
+     - angular magnification
 
 Zero matrix elements indicate special cases of imaging and focusing, as described in :numref:`TMA_zero_elements`.
 
@@ -81,6 +83,8 @@ and the subsequent medium :math:`n_o` :footcite:`pedrotti_pedrotti_pedrotti_2006
    \det (M) = AD - BC = \frac{n_i}{n_o}
    :label: eq_TMA_det
 
+All subsequent calculations follow the Cartesian sign convention, 
+where light travels left to right and distances to the right or up direction are positive.
 
 Propagation through Free Space 
 =================================================
@@ -340,7 +344,7 @@ For :math:`n_1 = n_2 = 1`, both definitions are equivalent.
 Lens Setups 
 =================================================
 
-To evaluate setups of :math:`N` lenses, the lens matrices :math:`\text{M}_\text{L,i}` 
+To evaluate optical systems of :math:`N` lenses, the lens matrices :math:`\text{M}_\text{L,i}` 
 and the free space matrices :math:`\text{M}_\text{s,j}` 
 with :math:`i \in	\{0, 1, \dots, N\},~~ j \in \{0, 1, \dots, N-1\}` need to be multiplied from right to left.
 
@@ -641,7 +645,7 @@ The pupils are defined as the image of the aperture stop within the respective g
 
    Visualization of the matrix separation and different distances.
 
-**Aperture inside setup**
+**Aperture inside the system**
 
 When the aperture stop is positioned within the lens setup, the system and its matrix :math:`\text{M}` 
 can be decomposed into three parts:
@@ -673,8 +677,8 @@ Subsequently, the resulting position :math:`z_\text{ex}` is obtained as follows:
    :label: eq_pupils_zex
 
 
-For the entrance pupil, the aperture stop is imaged in the backward direction through :math:`\text{M}_\text{front}` 
-by inverting the matrix:
+The entrance pupil is found by imaging the stop backwards through the preceding elements 
+using the inverse matrix :math:`\text{M}^{-1}_\text{front}`:
 
 .. math::
    \text{M}^{-1}_\text{front} &= \left[\begin{array}{cc}
@@ -703,7 +707,7 @@ group to determine the entrance pupil position:
    :label: eq_pupils_zen
 
 
-**Aperture in front of setup**
+**Aperture in front of the system**
 
 When the aperture stop is located in front of all lenses, it directly serves as the entrance pupil, 
 thus :math:`z_\text{en} = z_\text{s}`.
@@ -713,9 +717,10 @@ The exit pupil is then calculated by imaging through all elements using the matr
    \text{M}_\text{rear} = \text{M} 
    :label: eq_pupils_rear_only
 
-**Aperture behind the setup**
+**Aperture behind the system**
 
-The stop is identical to the exit pupil when positioned behind all lenses (:math:`z_\text{ex} = z_\text{s}`).
+The aperture stop itself constitutes the exit pupil 
+when positioned behind all lenses (:math:`z_\text{ex} = z_\text{s}`).
 Then, the entrance pupil is the result of imaging backwards through all elements 
 with the procedure above and the matrix:
 

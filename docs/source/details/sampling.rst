@@ -7,7 +7,7 @@ Overview
 ====================
 
 Optrace approximates optical effects by utilizing an Unbiased Quasi Monte Carlo simulation. 
-Inverse Transform Sampling is used as method for non-uniform random variate generation and Stratified Sampling 
+Inverse Transform Sampling is used as method for non-uniform random variable generation and Stratified Sampling 
 as low discrepancy method for the generation of the initial uniform random variable.
 
 
@@ -19,21 +19,19 @@ by randomly choosing and simulating a subset of all property and variable combin
 **Quasi Monte Carlo Simulation:** Monte Carlo Simulation, but the sampling is not truly random nor pseudo-random. 
 Instead it has some underlying deterministic or semi-deterministic nature to it. See low-discrepancy methods below.
 
-**Unbiased and Biased Methods:** Performing an unbiased Monte Carlo simulation with an infinitely large set of samples
-produces an exact description of the physical system. 
-Starting with few samples, with a larger and larger number the simulation converges towards the correct behavior. 
-In contrast, a biased simulation never reaches a fully accurate description of the system.
-Biased methods can consist of neural network tasks or algorithms that comprise of some simplification of the system model.
-A more mathematical descriptions of biasedness can be found here: :footcite:`ScratchEstimators`
+**Unbiased and Biased Methods:** For unbiased methods, 
+the expected value of the results is without any systematic error and always equal to the true physical value.
+A biased simulation contains such a systematic deviation, 
+but might considerably reduce visible noise or computation time (e.g., in neural network denoising). 
+A more mathematical description of bias can be found here: :footcite:`ScratchEstimators`
 
 **Non-Uniform Random Variate Generation:** Generating random numbers, while some numbers are more likely 
 to be chosen than others. The probability distribution is non-uniform.
 
-**Low Discrepancy Method:** Methods that generate numbers, where the distribution of these values 
-only deviates weakly from an equidistribution. 
-White noise is a high discrepancy method, as many samples are needed to approximate a true equidistribution. 
+**Low Discrepancy Method:** Values from these methods only deviates weakly from an equidistribution. 
+White noise is a high discrepancy method, as many samples are required to approximate a true equidistribution. 
 A regular value grid is a zero discrepancy method, since the values are always regularly distributed. 
-Low discrepancy methods can be seen as a compromise between those two, trying to create values that fill 
+Low discrepancy methods can be seen as a compromise between these two, trying to create values that fill 
 an interval or area more uniformly than random values, but are less "obviously deterministic" than simple grids. 
 Important types of low discrepancy methods include Hamilton and Sobol sequences as well as lattice methods.
 

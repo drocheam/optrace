@@ -29,7 +29,7 @@ In the case of so-called spectral homogeneity, the spectrum :math:`S` is consist
 but is scaled by a location-dependent intensity factor :math:`\text{im}_S(x, y)`. 
 The concept of spectral homogeneity goes back to Barnden (1974) :footcite:`Barnden_1974`, 
 who also describes this mathematical simplification. 
-Ravikumar et al. (2008) :footcite:`Ravikumar_2008` also uses this to generate color images.
+Ravikumar et al. (2008) :footcite:`Ravikumar_2008` also use this to generate color images.
 
 For an example :math:`S(\lambda)`, it holds that:
 
@@ -43,7 +43,7 @@ For an example :math:`S(\lambda)`, it holds that:
 The spectrum is a constant with respect to the convolution expression and can therefore 
 also be multiplied with the PSF. We define the new spectrally weighted PSF :math:`\text{psf}_S(x, y, \lambda)`.
 
-Convolution of channel-wise spectrally homogeneous RGB image and an RGB PSF
+Channel-wise spectrally homogeneous RGB image and RGB PSF
 -------------------------------------------------------------------------------
 
 Typically, the spectral profile of the image result is of no interest. 
@@ -125,13 +125,13 @@ Let :math:`a_R, a_G, a_B` be the relative mixing factors. The final result can b
    + a_G \,\text{im}_{2,G\rightarrow rgb}(x, y) + a_B\, \text{im}_{2,B\rightarrow rgb}(x, y)
    :label: eq_conv_rgb_rgb_to_rgb
 
-Equation :math:numref:`r_g_b_factors` illustrates the RGB color spectra and respective weighting factors. 
+Equation :math:numref:`r_g_b_factors` defines the respective weighting factors. 
 Rather than applying the rescaling subsequently, the power ratios might be integrated into the relative R, G, B PSFs.
 
-Convolution of a spectral homogeneous image and an RGB PSF
+Spectral homogeneous image and RGB PSF
 --------------------------------------------------------------
 
-In the special case where the image is spectrally homogeneous for a single spectrum :math:`S`. 
+In the special case where the image is spectrally homogeneous for a single spectrum :math:`S`, 
 the transformation can then be represented by:
 
 .. math::
@@ -146,7 +146,7 @@ the transformation can then be represented by:
 In this context, :math:`\text{im}_S` describes the spatial distribution of the intensity of the source, 
 which emits the spectrum :math:`S`.
 
-Convolution of RGB image and wavelength-independent PSF
+RGB image and wavelength-independent PSF
 --------------------------------------------------------
 
 With a wavelength-independent PSF, the RGB image is simply calculated 
@@ -163,7 +163,7 @@ by convolving each channel with the same :math:`\text{psf}(x, y)`:
 
 A wavelength-independent absorption in the optical setup is modelled through a scaling of the PSF.
 
-Convolution of spectral homogeneous image and PSF
+Spectral homogeneous image and PSF
 --------------------------------------------------
 
 With both PSF and image spectrally homogeneous, equation :math:numref:`eq_conv_special_case_spectral_homogenity`
@@ -179,7 +179,7 @@ Spatial and spectral information are now independent.
 In the result :math:`\text{im}_2(x, y)` encodes the intensity of each pixel, while :math:`S_2` provides the spectrum.
 :math:`S_\text{im}` denotes the emitted spectrum at each pixel, while :math:`s_\text{psf}` describes the global spectral
 weighting of the PSF.
-As an example, the former can be a broad blue spectrum and the latter only permits wavelengths near the violet region.
+As an example, the former can be a broad blue spectrum and the latter only transmits wavelengths near the violet region.
 
 With a known :math:`S_2` the corresponding sRGB color can be calculated using the :math:`r, g, b` matching functions.
 After calculating :math:`\text{im}_2` by convolution this color value gets repeated at every pixel and scaled by
@@ -229,8 +229,8 @@ Nonetheless, the relevance of this option is debatable, as normalized color imag
 
 Downscaling the PSF needs to be executed in a manner that conserves energy.
 Moreover, it is essential to choose a method that prevents aliasing. 
-We utilize the scaling with the `INTER_AREA <https://docs.opencv.org/4.x/da/d54/group__imgproc__transform.html#gga5bb5a1fea74ea38e1a5445ca803ff121acf959dca2480cc694ca016b81b442ceb>`__ 
-option from OpenCV within the resize function. 
+Here, the scaling with the `INTER_AREA <https://docs.opencv.org/4.x/da/d54/group__imgproc__transform.html#gga5bb5a1fea74ea38e1a5445ca803ff121acf959dca2480cc694ca016b81b442ceb>`__ 
+option from OpenCV within the resize function is utilized. 
 The PSF must be rescaled so that the physical pixel dimensions of the image and the PSF align in both dimensions. 
 Consequently, it becomes sufficient to convolve the image as a pixel matrix, even when the pixels are not square.
 

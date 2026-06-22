@@ -10,10 +10,10 @@ Tracing Procedure
 Tracing Process
 ========================
 
-The tracing process primarily involves three key steps: 
-detecting surface hits, calculating refraction indices and directions, 
+The tracing process consists of three primary stages:
+detecting ray-surface intersections, calculating refraction indices and directions, 
 and managing rays that do not contact a surface. 
-For ideal lenses, filters, and apertures, only one instance of surface hit detection is required, 
+For ideal lenses, filters, and apertures, only one instance of surface intersection detection is required, 
 whereas a standard lens requires two.
 
 Utilizing multiple threads for the majority of tracing tasks significantly enhances computational speed. 
@@ -39,7 +39,7 @@ The law of refraction is typically expressed in terms of input and output angles
 However, for the tracing process, a vector-based formulation is more convenient 
 as it avoids the need to calculate any angles directly.
 
-The following figure illustrates the refraction of a ray on a curved surface.
+The following figure illustrates the refraction of a ray at a curved surface.
 
 
 .. figure:: ../images/refraction_interface.svg
@@ -47,7 +47,7 @@ The following figure illustrates the refraction of a ray on a curved surface.
    :align: center
    :class: dark-light
    
-   Refraction on a curved interface.
+   Refraction at a curved interface.
 
 The refractive indices of the media are denoted as :math:`n_1` and :math:`n_2`, 
 while :math:`s` and :math:`s'` represent the input and output propagation vectors, respectively. 
@@ -285,7 +285,7 @@ the surface is extended so that all rays intersect a surface.
 Gaps on the surface are filled, and the surface edge is extended radially towards infinity. 
 
 An intersection is calculated for this extended surface. 
-The ray is marked as hitting or non-hitting based on a surface mask afterwards.
+The ray is marked as intersecting or non-intersecting based on a surface mask afterwards.
 
 .. figure:: ../images/surface_extension.svg
    :width: 900
@@ -326,7 +326,7 @@ Inserting these equations into each other results in:
     (\vec{p_0} + \vec{s}\cdot t_\text{h} - \vec{q}) \cdot \vec{n} = 0
    :label: plane_intersection_formula0
 
-Rearranging provides the ray parameter for the hit position :math:`t_\text{h}` 
+Rearranging provides the ray parameter for the intersection position :math:`t_\text{h}` 
 for the case where :math:`\vec{s} \cdot \vec{n} \neq 0`:
 
 .. math::
@@ -431,8 +431,8 @@ producing a single intersection in the first case of equation :math:numref:`Inte
 
 .. _numerical_hit_find:
 
-Numerical Hit Search
------------------------
+Numerical Intersection Search
+------------------------------
 
 In cases where the asphere equation or arbitrary analytical functions are involved, 
 an analytical solution for ray intersection does not exist. 
@@ -467,7 +467,7 @@ with only a slight modification.
 This procedure requires the knowledge of an interval containing a root.
 As the minimum and maximum extent of the surface in the z-direction are predetermined in the raytracer, 
 this requirement is inherently satisfied: 
-A hit can only occur within this range. 
+An intersection can only occur within this range. 
 The method functions by iteratively reducing the interval containing the function's root. 
 A detailed explanation can be found in :footcite:`RegulaFalsiWiki`.
 
@@ -637,16 +637,18 @@ DataSurface
 
 A `DataSurface` object utilizes the :class:`scipy.interpolate.InterpolatedUnivariateSpline` (FunctionSurface1D) 
 or the :class:`scipy.interpolate.RectBivariateSpline` (FunctionSurface2D) to interpolate surface values.
-To ensure smooth curvature transitions, an interpolation order of :python:`k=4` is applied in all lateral dimensions.
+An interpolation order of :python:`k=4` is applied in all lateral dimensions, 
+which ensures continuity of the third derivative and therefore smooth curvature transitions.
 
 By invoking the spline objects with :meth:`scipy.interpolate.InterpolatedUnivariateSpline.__call__` 
 or :meth:`scipy.interpolate.RectBivariateSpline.__call__`, it is possible to specify a derivative parameter,
 enabling the output of surface derivatives.
 These derivatives can then be used to compute surface normals, as described in the methods discussed earlier.
 
-It is important to note that due to the nature of interpolation, 
-the minimum and maximum surface values may exceed the specified data range. 
-A warning informs the user about the occurrence of large deviations.
+.. warning::
+    It is important to note that due to the nature of interpolation, 
+    the minimum and maximum surface values may exceed the specified data range. 
+    A warning informs the user about the occurrence of large deviations.
 
 ------------
 

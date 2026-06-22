@@ -25,8 +25,7 @@ diffraction phenomena :footcite:`Heinisch_1971, Freniere_2006, Serikov_2001`.
 HURB has been implemented in commercial raytracers such as TracePro :footcite:`Freniere_1999`, 
 as well as open-source projects like ISET3D :footcite:`Lian_2019`. 
 While extensions exist that incorporate the light's phase to model interference effects 
-:footcite:`Freniere_2006, Serikov_2001, Yuan_2016`, these are outside the scope of this work.
-
+:footcite:`Freniere_2006, Serikov_2001, Yuan_2016`, they fall outside the scope of the current implementation.
 
 Directional Distribution
 ==================================
@@ -355,7 +354,7 @@ All simulations were conducted with an uncertainty factor of :math:`\gamma = \sq
    :width: 700
    :class: dark-light
 
-   Comparison of HURB and the theoretical curve for the profile of edge diffraction.
+   Comparison of HURB and the theoretical curve for the diffraction profile of an edge.
 
 ------------
 

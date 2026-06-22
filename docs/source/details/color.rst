@@ -54,7 +54,7 @@ Using a spectral power distribution :math:`P(\lambda)` and the three color match
    :label: XYZ_Calc
 
 Among these, the :math:`Y` component corresponds to the perceived brightness of the stimulus. 
-To convert this value into the luminous flux :math:`\Phi_v`, commonly used in photometry, 
+To convert this value into the luminance :math:`\Phi_v`, commonly used in photometry, 
 a simple scaling by the luminous efficacy constant is applied:
 
 .. math::
@@ -216,8 +216,8 @@ The inverse transformation from sRGB to XYZ is performed as follows :footcite:`B
 As illustrated in :numref:`chroma_1931`, the sRGB color gamut does not encompass the entirety of humanly visible colors. 
 Various approaches exist to handle colors that fall outside this gamut.
 The simplest is to simply clamp any negative sRGB values to zero, often resulting in inaccurate color and brightness
-representation. This approach is still commonly found, most probably
-due to its ease of implementation or a lack of awareness of better methods 
+representation. 
+This approach is common due to its simplicity, despite its inaccuracies.
 
 Source :footcite:`OttossonClipping` presents several more sophisticated *gamut clipping* techniques designed 
 to minimize the visual artifacts.
