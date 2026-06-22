@@ -1,0 +1,128 @@
+
+/*overwrite style*/
+html {
+    --syntax-meta:  var(--syntax-comment) !important;
+    --yue-c-code-text: var(--sg-text-color) !important;
+    --yue-c-ol-marker: var(--gray-11) !important;
+    --yue-c-ul-marker: var(--gray-11) !important;
+}
+
+/*show equation numbers on the right*/
+.eqno {
+    float: right
+}
+
+/*decrease size of left side bar below 1000px width*/
+@media (max-width: 1000px) {
+  .md\:shrink-0 {
+    max-width: 200px;
+  }
+}
+
+/*no empty space on the right below 768px width*/
+@media (min-width: 768px) {
+  .sy-main {
+      width: calc(100% - 13rem);
+  }
+}
+
+/*lower size of headers below 600px so landscape on mobile is more usable*/
+@media (max-height: 600px) {
+    html {
+        --sy-s-navbar-height: 45px !important;
+    }
+    .sy-breadcrumbs-inner {
+        padding: 0.75rem 0 0.75rem
+    }
+}
+
+/*show toc tree markers as links*/
+.yue .toctree-wrapper a {
+    border-bottom: 1px solid var(--yue-c-link-border)
+}
+
+/*invert contact image in dark mode*/
+html.dark .contact-image {
+    filter: invert() !important
+}
+
+/*unset padding and background color of contact image*/
+.contact-image {
+    background-color: unset !important;
+    padding: unset;
+    height: 140px;
+    margin-left: 0px !important
+}
+
+/*fix color and spacing of bullet point lists*/
+.yue li {
+
+    dt {
+        color: unset;
+        font-weight: unset;
+    }
+    p, dl {    
+        margin-top: unset;
+        margin-bottom: unset;
+    }
+}
+
+/*word wrapping for code blocks*/
+pre {
+    white-space: pre-wrap;
+    word-break: normal;
+    overflow-wrap: anywhere
+}
+
+/*class for deactivating wrapping*/
+.prenowrap pre {
+    white-space: pre;
+    word-break: unset;
+}
+
+/** new borderless class for image and object alignment **/
+.table-borderless {
+ 
+    border:none !important;
+
+    tr {
+        background-color: inherit !important;
+        border-bottom-width: 0px !important
+    }
+    caption {
+        border-bottom: unset !important
+    }
+    td {
+        border-left: unset !important;
+        max-width: 0px;
+        vertical-align: top !important;
+    }
+    figure {
+        margin-top: 0rem;
+        margin-bottom: 0rem;
+    }
+    figcaption {
+        font-size: 1em
+    }
+}
+
+/*don't show borders around tables*/
+.table-wrapper {
+    border: unset !important
+}
+
+/**add padding-top so upper math part isn't cut off**/
+div.math mjx-container {
+    padding-top: 0.2rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/*[>don't show reference links as superscript<]*/
+a.footnote-reference, a::before, a::after {
+    vertical-align: unset;
+    font-size: unset;
+    /*font-family: unset;*/
+    /*margin-right: unset;*/
+}
+
