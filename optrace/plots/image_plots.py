@@ -60,8 +60,7 @@ def image_plot(im:       ScalarImage | GrayscaleImage | RGBImage,
         extent = extent[[1, 0, 3, 2]]
 
     # set colormap and color norm
-    current_cmap = matplotlib.colormaps["Greys_r"].copy()
-    current_cmap.set_bad(color='black')
+    current_cmap = matplotlib.colormaps["Greys_r"].with_extremes(bad='black')
     norm = matplotlib.colors.LogNorm() if log and Imd.ndim == 2 else None
 
     # make image black if all content is zero
