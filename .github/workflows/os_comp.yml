@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 12
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     
     # headless display (Linux and Windows)
     - name: Setup headless display
