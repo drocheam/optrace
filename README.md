@@ -28,7 +28,7 @@ Furthermore, optrace's automation features and extensibility, including support 
 make it a viable tool for research applications. 
 As such, optrace has already been used for the simulation of intraocular lenses in two peer-reviewed publications 
 in the journal *Translational Vision Science & Technology*
-([Paper 1](https://doi.org/10.1167/tvst.13.8.33), [Paper 2](https://doi.org/10.1167/tvst.14.12.33>)).
+([Paper 1](https://doi.org/10.1167/tvst.13.8.33), [Paper 2](https://doi.org/10.1167/tvst.14.12.33)).
 
 
  **Features**
