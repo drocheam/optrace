@@ -310,3 +310,10 @@ Before running Python, set the following environment variable, so the X11 window
 
    export QT_QPA_PLATFORM=xcb
 
+It can alternatively be set inside a Python script:
+
+.. code-block:: python
+
+   import os
+   os.environ.setdefault("QT_QPA_PLATFORM", "xcb")
+
