@@ -1208,7 +1208,7 @@ class TraceGUI(HasTraits):
                     else:
                         self._plot.remove_fault_markers()
                         self._dec_status("Tracing", notify=False)  
-                        # TODO there is a gap for busyness between Tracing=Off and Drawing=On
+                        # TODO there is a gap for business between Tracing=Off and Drawing=On
                         self.replot_rays()
 
                 self.invoke_later(on_finish)

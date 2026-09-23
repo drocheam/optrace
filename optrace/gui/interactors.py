@@ -65,45 +65,40 @@ class Picker:
 class CameraOrientationWidgetFixes:
         
     def __init__(self, 
-                 plotter:           ScenePlotting, 
                  scene:             QtInteractor, 
                  orientation_axes:  vtkmodules.vtkInteractionWidgets.vtkCameraOrientationWidget)\
             -> None:
         """
-        Apply the following fixes to the Camera Orienation Widget:
+        Apply the following fixes to the Camera Orientation Widget:
         - Clicking the +Y or -Y handle shows the X axis in up or down direction
-        - Clicking the handles does not change the zoom or camera position
-        - No rendering of the view while applying these properties
         """
-        self._plotter = plotter
         self._scene = scene
         self._orientation_axes = orientation_axes
-        self.__oa_cam_props = None
 
     def _on_orientation_change_start(self, 
                                      widget:    vtkmodules.vtkInteractionWidgets.vtkCameraOrientationWidget, 
                                      event:     str)\
             -> None:
-        """store camera props and disable render in the case that a handle is selected"""
+        """disable render in the case that a handle is selected, 
+        as there would be a race to who applies the setting first"""
         self._scene.interactor.EnableRenderOff()
-        self.__oa_cam_props = self._plotter.get_camera()
    
     def _on_orientation_change_interact(self,
                                         widget: vtkmodules.vtkInteractionWidgets.vtkCameraOrientationWidget,
                                         event:  str)\
             -> None:
-        """reenable rendering while interacting with the widget"""
+        """reenable rendering while interacting with the widget itself by dragging"""
         self._scene.interactor.EnableRenderOn()
-    
+
     def _on_orientation_change_end(self,
                                    widget: vtkmodules.vtkInteractionWidgets.vtkCameraOrientationWidget,
                                    event:  str)\
             -> None:
         """restore camera center and scale and handle +y and -y views so x points up/downwards"""
         if widget.GetRepresentation().IsAnyHandleSelected():
-            normal = self._plotter.get_camera()[2]
-            roll = 90 if abs(normal[1]) == 1 else 0
-            self._plotter.set_camera(*self.__oa_cam_props[:2], roll=roll)
+            normal = self._scene.camera.direction
+            self._scene.camera.roll = 90 if abs(normal[1]) == 1 else 0
+            self._scene.camera.reset_clipping_range()
             self._scene.interactor.EnableRenderOn()
 
     def activate(self) -> None:

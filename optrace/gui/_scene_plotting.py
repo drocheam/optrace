@@ -101,7 +101,7 @@ class ScenePlotting:
     def apply_prop(prop, **kwargs):
         """apply properties to object prop"""
         for key, val in kwargs.items():
-            if hasattr(prop, key):
+            if hasattr(prop, key) and val is not None:
                 setattr(prop, key, val)
    
     def screenshot(self, path: str = None, **kwargs) -> np.ndarray:
@@ -122,7 +122,7 @@ class ScenePlotting:
         """
         return self.scene.camera.focal_point,\
                self.scene.camera.parallel_scale,\
-               np.array(self.scene.camera.GetDirectionOfProjection()),\
+               np.array(self.scene.camera.direction),\
                self.scene.camera.roll\
 
     def set_camera(self, 
@@ -146,12 +146,12 @@ class ScenePlotting:
        
         # calculate vector between camera and focal point
         cam = self.scene.camera
-        normal = np.asarray(direction, dtype=np.float64) if direction is not None\
-                else np.array(cam.GetDirectionOfProjection())
+        old_normal = np.array(cam.direction)
+        normal = np.asarray(direction, dtype=np.float64) if direction is not None else old_normal 
         dist_vec = cam.distance * normal / (np.linalg.norm(normal) + 1e-12) 
 
         # old cross product of direction and view_up
-        right = np.cross(cam.GetDirectionOfProjection(), cam.up)
+        right = np.cross(cam.direction, cam.up)
 
         if center is not None:
             cam.focal_point = center
@@ -162,8 +162,12 @@ class ScenePlotting:
         # set/update camera position (since either/both focal_point or direction changed)
         cam.position = cam.focal_point - dist_vec
 
-        # update view_up from new normal and old cross product of direction and view_up 
-        cam.up = np.cross(cam.GetDirectionOfProjection(), -right)
+        # update view_up from new normal and old cross product of direction and view_up
+        up = np.cross(cam.direction, -right)
+        if up.sum():
+            cam.up = up
+        else:  # parallel -> use axis orthogonal to direction change
+            cam.up = np.cross(cam.direction, -np.array(old_normal))
 
         # absolute roll angle
         if roll is not None:
@@ -248,7 +252,8 @@ class ScenePlotting:
 
         # create Orientation Widget and apply fixes
         self._orientation_axes = self.scene.add_camera_orientation_widget(animate=False, n_frames=0)
-        fixes = CameraOrientationWidgetFixes(self, self.scene, self._orientation_axes)
+        self._orientation_axes.ShouldResetCameraOff()
+        fixes = CameraOrientationWidgetFixes(self.scene, self._orientation_axes)
         fixes.activate()
 
         self._orientation_axes.GetRepresentation().SetSize(85, 85)
@@ -304,53 +309,78 @@ class ScenePlotting:
         # return linspace of full range with maximum label count
         return np.linspace(x0, x1, max_s+1)
 
+    def add_point_labels(self, points, labels, name="", font_family="courier", text_color = None,
+                         justification_horizontal="center", justification_vertical="center", visibility = True, 
+                         **text_args):
+        """more performant replacement for pyvista.scene.add_point_labels"""
+        actors = []
+
+        for point, label in zip(points, labels):
+            actor = vtk.vtkBillboardTextActor3D()
+            actor.SetInput(label)
+            actor.SetPosition(*point)
+            self.apply_prop(actor, name=name, pickable=False, force_opaque=True, visibility=visibility)
+
+            prop = actor.GetTextProperty()
+            self.apply_prop(prop, color=text_color, **text_args)
+
+            if font_family == "courier":
+                prop.SetFontFamilyToCourier()
+            elif font_family == "times":
+                prop.SetFontFamilyToTimes()
+
+            if justification_horizontal == "right":
+                prop.SetJustificationToRight()
+            elif justification_horizontal == "center":
+                prop.SetJustificationToCentered()
+            else:
+                prop.SetJustificationToLeft()
+
+            if justification_vertical == "top":
+                prop.SetVerticalJustificationToTop()
+            elif justification_vertical == "center":
+                prop.SetVerticalJustificationToCentered()
+            else:
+                prop.SetVerticalJustificationToBottom()
+
+            actors.append(actor)
+            self.scene.renderer.AddActor(actor)
+
+        return actors
 
     def plot_axes(self) -> None:
         """plot cartesian axes"""
+        self.__remove_objects([self._axes_labels])
 
-   
-        def add_point_labels(x, y, name="", orientation=0, **kwargs):
-            i = 0
-            el = []
-            for xi, yi in zip(x, y):
-                ax = self.scene.add_point_labels([xi], [yi], name=f"{name}{i}", **kwargs)
-                ax.GetMapper().Update()  # update so we can set text properties
-                ax.GetMapper().GetInputDataObject(0, 0).GetTextProperty().SetOrientation(orientation)
-                ax.visibility = not self.ui.minimalistic_view
-                el.append(ax)
-                i += 1
-            
-            return el
-        
         ext = self.raytracer.outline
-        args = dict(font_size=11, bold=True, font_family="courier", pickable=False, fill_shape=False, render=False, 
-                    justification_horizontal="center", justification_vertical="center", always_visible=True, 
-                    text_color=self._axis_color, show_points=False, shadow=not self.ui.high_contrast, shape_opacity=0.)
+        args = dict(font_size=11, bold=True, font_family="courier", visibility=not self.ui.minimalistic_view,
+                    justification_horizontal="center", justification_vertical="center", 
+                    text_color=self._axis_color, shadow=not self.ui.high_contrast)
 
         # X
         lx = self.calculate_label_positions(ext[0], ext[1], 4, 16)
         Lx = np.vstack((lx, np.repeat(ext[2], len(lx)), np.repeat(ext[4], len(lx)))).T
         Lxs = [f"{lxi:.6g} –" for lxi in lx]
-        axes_x = add_point_labels(Lx, Lxs, name=f"Labels x", **(args | dict(justification_horizontal="right")))
-        axes_x2 = add_point_labels([[(ext[0]+ext[1])/2, ext[2], ext[4]]], ["\nx / mm" + len(Lxs[len(Lxs)//2])*2*" "],
+        axes_x = self.add_point_labels(Lx, Lxs, name=f"Labels x", **(args | dict(justification_horizontal="right")))
+        axes_x2 = self.add_point_labels([[(ext[0]+ext[1])/2, ext[2], ext[4]]], ["\nx / mm" + len(Lxs[len(Lxs)//2])*2*" "],
                                    name=f"Title x", **(args | dict(justification_horizontal="right")))
        
         # Y
         ly = self.calculate_label_positions(ext[2], ext[3], 4, 16)
         Ly = np.vstack((np.repeat(ext[0], len(ly)), ly, np.repeat(ext[4], len(ly)))).T
         Lys = [f"{lyi:.6g} –" for lyi in ly] 
-        axes_y = add_point_labels(Ly, Lys, name=f"Labels y", **(args | dict(justification_horizontal="right")))
-        axes_y2 = add_point_labels([[ext[0], (ext[2]+ext[3])/2, ext[4]]], ["y / mm" + len(Lys[len(Lys)//2])*2*" "], 
+        axes_y = self.add_point_labels(Ly, Lys, name=f"Labels y", **(args | dict(justification_horizontal="right")))
+        axes_y2 = self.add_point_labels([[ext[0], (ext[2]+ext[3])/2, ext[4]]], ["y / mm" + len(Lys[len(Lys)//2])*2*" "], 
                                    name=f"Title y",  **(args | dict(justification_horizontal="right")))
         
         # Z
         lz = self.calculate_label_positions(ext[4], ext[5], 5, 24)
         Lz = np.vstack((np.repeat(ext[0], len(lz)), np.repeat(ext[2], len(lz)), lz)).T
         Lzs = [f"\n\n{lzi:.6g}" for lzi in lz] 
-        axes_z = add_point_labels(Lz, Lzs, name=f"Labels z", **args)
-        axes_z2 = add_point_labels(Lz, ["–"]*len(Lzs), name=f"Ticks z", orientation=90, 
+        axes_z = self.add_point_labels(Lz, Lzs, name=f"Labels z", **args)
+        axes_z2 = self.add_point_labels(Lz, ["–"]*len(Lzs), name=f"Ticks z", orientation=90, 
                                    **(args | dict(justification_horizontal="right")))
-        axes_z3 = add_point_labels([[ext[0], ext[2], (ext[4]+ext[5])/2]], ["\n\nz / mm"], name=f"Title z", 
+        axes_z3 = self.add_point_labels([[ext[0], ext[2], (ext[4]+ext[5])/2]], ["\n\nz / mm"], name=f"Title z", 
                        **(args | dict(justification_vertical="top")))
         
         self._axes_labels = [*axes_x, *axes_x2, *axes_y, *axes_y2, *axes_z, *axes_z2, *axes_z3]
@@ -413,8 +443,7 @@ class ScenePlotting:
             label = (f"ambient\n" if not self.ui.minimalistic_view else "")  + "n=" + nList[i].get_desc()
             text = self._plot_label([x_pos, y_pos, z_pos], label, f"Refraction Index Outline Label {i}",
                                     text_color=self._axis_color, shadow=not self.ui.high_contrast, bold=False,
-                                    background_opacity=0,
-                                    map_args=dict(frame_color=self._subtle_color, show_frame=True))
+                                    background_opacity=0, frame_color=self._subtle_color, frame=True)
 
             # append plot objects
             self._index_box_plots.append((outline, None, None, text, None))
@@ -484,8 +513,7 @@ class ScenePlotting:
             # Using add_point_labels for 3D placement that stays visible
             text_pos = [obj.pos[0], obj.extent[3], zl]
             text_actor = self._plot_label(text_pos, label_str, f"Label_{obj.abbr}{num}", 
-                                          text_color=self._foreground_color,
-                                          background_opacity=self._info_opacity, 
+                                          text_color=self._foreground_color, background_opacity=self._info_opacity, 
                                           background_color=self._info_frame_color)
 
         # plot BackSurface if one exists
@@ -558,8 +586,8 @@ class ScenePlotting:
 
         # add to scene
         self._ray_highlight_plot = self.scene.add_mesh(ray_mesh, scalars="scalars", cmap=lt, opacity=1.,
-                                                       line_width=self.ui.ray_width*1.5, 
-                                                       point_size=self.ui.ray_width*1.5, 
+                                                       line_width=self.ui.ray_width*1.75, 
+                                                       point_size=self.ui.ray_width*1.75, 
                                                        style="wireframe", render=False, lighting=False, 
                                                        name="Ray Highlight", render_points_as_spheres=True, 
                                                        pickable=False, show_scalar_bar=False)
@@ -576,46 +604,32 @@ class ScenePlotting:
             dy, dx = 0.2 * mark.marker_factor, 0
 
             if not mark.label_only:
-                actor = self.scene.add_point_labels([mark.pos], ["+"], font_family="times",
-                                                    name=f"Marker Cross {num}", render=False, pickable=False,
-                                                    font_size=int(15*mark.marker_factor),
-                                                    text_color=self._marker_color, show_points=False, shape_opacity=0,
-                                                    justification_horizontal="center", justification_vertical="center",
-                                                    always_visible=True)
+                actor = self.add_point_labels([mark.pos], ["+"], font_family="times", name=f"Marker Cross {num}",
+                                              font_size=int(15*mark.marker_factor), text_color=self._marker_color,
+                                              justification_horizontal="center", justification_vertical="center")[0]
             else:
                 actor = None
 
             text_actor = self._plot_label([mark.pos[0]+dx, mark.pos[1]+dy, mark.pos[2]], mark.desc, 
                                           f"Marker Label {num}", text_color=self._foreground_color,
-                                          background_opacity=self._info_opacity,
+                                          background_opacity=self._info_opacity, 
                                           background_color=self._info_frame_color, font_size=int(10*mark.text_factor))
                 
             self._point_marker_plots.append((actor, None, None, text_actor, mark))
    
-    def _plot_label(self, pos: list, label: str, name: str, map_args: dict = None, **kwargs)\
+    def _plot_label(self, pos: list, label: str, name: str, **kwargs)\
             -> vtkmodules.vtkRenderingCore.vtkActor2D:
         """plot a scene label that reacts to changes of hide_label, minimal_scene, vertical_labels and high_contrast"""    
-        pargs = dict(render=False, text_color=self._foreground_color, show_points=False, 
-                     shape_opacity=0, background_opacity=self._info_opacity, 
-                     background_color=self._info_frame_color, always_visible=True)
-
-        text_actor = self.scene.add_point_labels([pos], [label], name=name, **(pargs | self.LABEL_STYLE | kwargs))
-            
-        text_actor.GetMapper().Update()  # update so we can set text properties
-        tprop = text_actor.mapper.GetInputDataObject(0, 0).text_property
-
+        pargs = dict(text_color=self._foreground_color, background_opacity=self._info_opacity, 
+                     background_color=self._info_frame_color, visibility=not self.ui.hide_labels)
+        
         if self.ui.vertical_labels:
-            self.apply_prop(tprop, orientation=90, justification_horizontal="left", 
-                            justification_vertical="center")
+            vl_dict = dict(orientation=90, justification_horizontal="left", justification_vertical="center")
         else:
-            self.apply_prop(tprop, justification_horizontal="center", justification_vertical="bottom")
+            vl_dict = dict(justification_horizontal="center", justification_vertical="bottom")
 
-        if map_args is not None:
-            self.apply_prop(tprop, **map_args)
-
-        if self.ui.hide_labels:
-            text_actor.visibility = False
-
+        text_actor = self.add_point_labels([pos], [label], name=name, 
+                                           **(pargs | self.LABEL_STYLE | kwargs | vl_dict))[0]
         return text_actor
 
     def plot_line_markers(self) -> None:
@@ -637,7 +651,7 @@ class ScenePlotting:
                                         line_width=mark.line_factor)
 
                 text = self._plot_label([mark.pos[0]+dx, mark.pos[1]+dy, mark.pos[2]], mark.desc, 
-                        f"Line Marker Label {num}", text_color=self._foreground_color,
+                                        f"Line Marker Label {num}", text_color=self._foreground_color,
                                         background_opacity=self._info_opacity,
                                         background_color=self._info_frame_color, font_size=int(10*mark.text_factor))
 
@@ -674,7 +688,7 @@ class ScenePlotting:
         self._marker_color =        (0., 1., 0.)         if not high_contrast else self._foreground_color
         self._line_marker_color =   (0.8, 0, 0.8)        if not high_contrast else self._foreground_color
         self._outline_color =       (0.5, 0.5, 0.5)      if not high_contrast else (0.8, 0.8, 0.8)
-        self._axis_color =          (0.5, 0.5, 0.5)      if not high_contrast else (0.7, 0.7, 0.7)
+        self._axis_color =          (0.6, 0.6, 0.6)      if not high_contrast else (0.7, 0.7, 0.7)
         self._info_frame_color =    (0., 0., 0.)         if not high_contrast else (1., 1., 1.)
         self._volume_color =        (0.45, 0.45, 0.45)   if not high_contrast else (1., 1., 1.)
         self._cylinder_opacity =    self._lens_alpha     if not high_contrast else 0.6
@@ -728,7 +742,7 @@ class ScenePlotting:
                      self._index_box_plots]:
             for obj in objs:
                 if obj[3] is not None:
-                    self.apply_prop(obj[3].mapper.GetInputDataObject(0, 0).text_property, **opts)
+                    self.apply_prop(obj[3].GetTextProperty(), **opts)
 
     def change_minimalistic_view(self) -> None:
         """Hide long labels, orientation axes and normal axes depending on if option minimalistic_view is set"""
@@ -742,9 +756,9 @@ class ScenePlotting:
         # shorten index plot description
         for rio in self._index_box_plots:
             if rio[3] is not None:
-                label = rio[3].mapper.GetInputDataObject(0, 0).labels
-                text = label.GetValue(0)
-                label.SetValue(0, text.replace("ambient\n", "") if not show else ("ambient\n" + text))
+                # label = rio[3].GetText()
+                text = rio[3].GetInput()
+                rio[3].SetInput(text.replace("ambient\n", "") if not show else ("ambient\n" + text))
 
         # remove descriptions from labels in minimalistic_view
         for Objects in [self._ray_source_plots, self._lens_plots, self._volume_plots, 
@@ -753,7 +767,7 @@ class ScenePlotting:
                 if obj[3] is not None and obj[4] is not None:
                     label = f"{obj[4].abbr}{num}"
                     label = label if obj[4].desc == "" or not show else label + ": " + obj[4].desc
-                    obj[3].mapper.GetInputDataObject(0, 0).labels.SetValue(0, label)
+                    obj[3].SetInput(label)
 
         for ax in self._axes_labels:
             ax.visibility = show
@@ -800,15 +814,15 @@ class ScenePlotting:
         # special case: point marker plots are just labels
         for el in self._point_marker_plots:
             if el[0] is not None:
-                el[0].mapper.GetInputDataObject(0, 0).text_property.color = self._marker_color
+                el[0].GetTextProperty().color = self._marker_color
 
         # update background colors of labels
         for objs in [self._lens_plots, self._detector_plots, self._aperture_plots, self._filter_plots,
                      self._point_marker_plots, self._line_marker_plots, self._volume_plots, self._ray_source_plots]:
             for obj in objs:
                 if len(obj) > 3 and obj[3] is not None:
-                    obj[3].mapper.GetInputDataObject(0, 0).text_property.background_color = self._background_color
-                    obj[3].mapper.GetInputDataObject(0, 0).text_property.color = self._foreground_color
+                    obj[3].GetTextProperty().background_color = self._background_color
+                    obj[3].GetTextProperty().color = self._foreground_color
 
         # change lens cylinder visibility
         for lens in self._lens_plots:
@@ -817,17 +831,16 @@ class ScenePlotting:
 
         # update axes color
         for ax in self._axes_labels:
-            ax.mapper.GetInputDataObject(0, 0).text_property.color = self._axis_color
-            ax.mapper.GetInputDataObject(0, 0).text_property.SetShadow(not high_contrast)
+            ax.GetTextProperty().color = self._axis_color
+            ax.GetTextProperty().SetShadow(not high_contrast)
 
         # change index plot objects
         for obj in self._index_box_plots:
     
             if obj[3] is not None:
-                tprop = obj[3].mapper.GetInputDataObject(0, 0).text_property
-                tprop.frame_color = self._subtle_color
-                tprop.color = self._axis_color
-                tprop.SetShadow(not high_contrast)
+                obj[3].GetTextProperty().frame_color = self._subtle_color
+                obj[3].GetTextProperty().color = self._axis_color
+                obj[3].GetTextProperty().SetShadow(not high_contrast)
 
             if obj[0] is not None:
                 obj[0].prop.color = self._outline_color
@@ -929,10 +942,8 @@ class ScenePlotting:
             det[1].position = np.array(det[1].position) + [0, 0, diff]
 
             # move label
-            dataset = det[3].GetMapper().GetInputAlgorithm().GetInput()
-            vtk_pts = dataset.GetPoints()
-            vtk_pts.SetPoint(0, np.array(vtk_pts.GetPoint(0))+[0, 0, diff])
-            det[3].GetMapper().Modified()  # notify for replot
+            det[3].SetPosition(np.array(det[3].GetPosition())+[0, 0, diff])
+            det[3].Modified()  # notify for replot
 
     def clear_ray_text(self) -> None:
         """clear the ray info text"""
@@ -954,11 +965,12 @@ class ScenePlotting:
         
         :param pos: array with three elements (x, y, z)
         """
-        self._crosshair = self.scene.add_point_labels(pos, ["+"], name=f"Crosshair", font_size=32, bold=True, 
-                                                      font_family="times", render=False, always_visible=True, 
-                                                      justification_horizontal="center", shape_opacity=0.,
-                                                      justification_vertical="center", pickable=False,
-                                                      text_color=self._crosshair_color, show_points=False)
+        self.__remove_objects([[self._crosshair]])
+        self._crosshair = self.add_point_labels([pos], ["+"], name=f"Crosshair", font_size=32, bold=True, 
+                                                      font_family="times", 
+                                                      justification_horizontal="center",
+                                                      justification_vertical="center",
+                                                      text_color=self._crosshair_color)[0]
 
     # Ray and RaySource plotting
     ###################################################################################################################
