@@ -289,31 +289,3 @@ It is important to note that only some actions use multithreading,
 and only a few functions work with all available/specified cores. 
 Setting the CPU count only provides an upper limit.
 
-Running optrace on Wayland
-_____________________________________
-
-Issues persist when running vtk under Wayland on Linux
-(`vtk/issues/18701 <https://gitlab.kitware.com/vtk/vtk/-/issues/18701>`__, `pyvistaqt/issues/445 <https://github.com/pyvista/pyvistaqt/issues/445>`__).
-The following error message appears:
-
-.. code-block:: text
-
-   X Error of failed request: BadWindow (invalid Window parameter)
-   Major opcode of failed request: 12 (X_ConfigureWindow)
-   Resource id in failed request: 0x3
-   Serial number of failed request: 7
-   Current serial number in output stream: 8
-
-Before running Python, set the following environment variable, so the X11 windowing system is used instead:
-
-.. code-block:: bash
-
-   export QT_QPA_PLATFORM=xcb
-
-It can alternatively be set inside a Python script:
-
-.. code-block:: python
-
-   import os
-   os.environ.setdefault("QT_QPA_PLATFORM", "xcb")
-

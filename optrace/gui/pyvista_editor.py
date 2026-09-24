@@ -23,6 +23,14 @@ class _PyVistaEditor(Editor):
         # close all windows if the scene gets destroyed
         self.control.destroyed.connect(QtGui.QApplication.closeAllWindows)
 
+        # resizing fixes
+        self.control.resized.connect(self.on_resized)
+    
+    def on_resized(self):
+        # update GL size, is currently incorrectly handled on Wayland
+        # side effect: relative UI size changes depending on DPR of currently used monitor
+        self.control.resizeGL(self.control.size().width(), self.control.size().height())
+
     def set_size_policy(self, *args):
         pass
 

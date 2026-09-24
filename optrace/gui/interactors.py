@@ -40,6 +40,13 @@ class Picker:
         if not self._mm:
             if self._mmb:
                 x, y = iren.GetEventPosition()
+
+                # there were scene scaling issues under Wayland, so scene size with DPR does not match vtk size.
+                # Noticeable by click and pick position differing.
+                # Should be fixed by now, but ensure by scaling with size ratio.
+                x /= self._scene.size().width() * self._scene.devicePixelRatioF() / iren.GetSize()[0]
+                y /= self._scene.size().height() * self._scene.devicePixelRatioF() / iren.GetSize()[1]
+
                 self._scene.picker.Pick(x, y, 0, self._scene.renderer)
 
     def _on_pick(self, picker: vtkmodules.vtkRenderingCore.vtkPointPicker, event: str) -> None:

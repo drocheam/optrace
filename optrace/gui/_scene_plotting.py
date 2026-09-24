@@ -260,12 +260,6 @@ class ScenePlotting:
         self._orientation_axes.GetRepresentation().AnchorToLowerLeft()
         self._orientation_axes.GetRepresentation().SetVisibility(not bool(self.ui.minimalistic_view))
         
-        # optional: adapt colors. Only supported from vtk>=9.6
-        # if hasattr(self._plot._orientation.GetRepresentation(), "SetXAxisColor"):
-            # self._plot._orientation.GetRepresentation().SetXAxisColor(0.7, 0., 0.)
-            # self._plot._orientation.GetRepresentation().SetYAxisColor(0., 0.7, 0.)
-            # self._plot._orientation.GetRepresentation().SetZAxisColor(0., 0., 0.7)
-
     @staticmethod
     def calculate_label_positions(x0: float, x1: float, min_s: int, max_s: int) -> np.ndarray:
         """

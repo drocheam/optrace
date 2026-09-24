@@ -198,6 +198,12 @@ This can't be tested automatically, as it would halt testing.
 
 Can only be tested by a human viewer.
 
+**Check varying (fractional) scaling for multi-monitor setups under Wayland** 
+
+Use the ``QT_QPA_PLATFORM`` environment variable under Linux with either ``"xcb"`` or ``"wayland"``
+under Linux to control the display server protocol.
+With X11 only one global scaling setting was possible for all monitors.
+
 **Usage in Python Notebooks or inline IDEs such as Spyder**
 
 * Spyder Installation:
@@ -238,7 +244,7 @@ The pytest configuration is located in the ``pyproject.toml`` in Section :numref
 * `tox-ignore-env-name-mismatch <https://github.com/masenf/tox-ignore-env-name-mismatch>`_ is required so multiple
   tox environments are able to use the same Python virtualenv.
 
-* when GUI tests fail on wayland, first run :bash:`xhost +`
+* when GUI tests fail on Wayland, first run :bash:`xhost +`
 
 * some tests are excluded in GitHub actions, as there issues with the headless displays
 
