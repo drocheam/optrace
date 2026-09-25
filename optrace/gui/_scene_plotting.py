@@ -623,7 +623,8 @@ class ScenePlotting:
             if not mark.label_only:
                 actor = self.add_point_labels([mark.pos], ["+"], font_family="times", name=f"Marker Cross {num}",
                                               font_size=int(15*mark.marker_factor), text_color=self._marker_color,
-                                              justification_horizontal="center", justification_vertical="center")[0]
+                                              justification_horizontal="center", justification_vertical="center",
+                                              shadow=False, italic=False)[0]
             else:
                 actor = None
 
@@ -988,10 +989,8 @@ class ScenePlotting:
         """
         self.__remove_objects([[self._crosshair]])
         self._crosshair = self.add_point_labels([pos], ["+"], name=f"Crosshair", font_size=32, bold=True, 
-                                                      font_family="times", 
-                                                      justification_horizontal="center",
-                                                      justification_vertical="center",
-                                                      text_color=self._crosshair_color)[0]
+                                                font_family="times", shadow=False, justification_horizontal="center", 
+                                                justification_vertical="center", text_color=self._crosshair_color)[0]
 
     # Ray and RaySource plotting
     ###################################################################################################################
@@ -1012,22 +1011,22 @@ class ScenePlotting:
             case 'Power':
                 s = w_.ravel()*1e6
                 cm = "gnuplot"
-                title = "Ray Power\n in µW\n"
+                title = "Ray Power in µW"
 
             case 'Source':
                 s = np.broadcast_to(snum_[:, np.newaxis], (snum_.shape[0], nt))
                 cm = "spring"
-                title = "Ray Source\nNumber"
+                title = "Ray Source Number"
 
             case 'Wavelength':
                 s = np.broadcast_to(wl_[:, np.newaxis], (wl_.shape[0], nt))
                 cm = "nipy_spectral"
-                title = "Wavelength\n in nm\n"
+                title = "Wavelength in nm"
 
             case 'Refractive Index':
                 s = n_.ravel()
                 cm = "gnuplot"
-                title = "Refractive\nIndex"
+                title = "Refractive Index"
 
             case ('Polarization xz' | 'Polarization yz'):
 
@@ -1041,12 +1040,12 @@ class ScenePlotting:
                 if self.ui.coloring_mode == "Polarization yz":
                     # projection of unity vector onto yz plane is the pythagorean sum of the y and z component
                     s = np.hypot(pol_[:, :, 1], pol_[:, :, 2]).ravel()
-                    title = "Polarization\n projection\n on yz-plane"
+                    title = "Polarization projection on yz-plane"
 
                 else:
                     # projection of unity vector onto xz plane is the pythagorean sum of the x and z component
                     s = np.hypot(pol_[:, :, 0], pol_[:, :, 2]).ravel()
-                    title = "Polarization\n projection\n on xz-plane"
+                    title = "Polarization projection on xz-plane"
 
                 cm = "gnuplot"
 
@@ -1062,27 +1061,27 @@ class ScenePlotting:
         lutm.apply_cmap(cm)
         table = pv.pyvista_ndarray(lutm.GetTable())
 
-        self.apply_prop(bar, title=title, orientation=1, number_of_labels=11, label_format="%-6.3f", 
+        self.apply_prop(bar, title=title+"\n", orientation=0, number_of_labels=11, label_format="%.3f", 
                         visibility=self.ui.coloring_mode != "Plain")
         text_style = self.INFO_STYLE | dict(font_family=1, color=self._foreground_color) 
-        self.apply_prop(bar.GetTitleTextProperty(), **text_style)
-        self.apply_prop(bar.GetLabelTextProperty(), **(text_style | dict(font_size=12)))
+        self.apply_prop(bar.GetTitleTextProperty(), **(text_style | dict(line_spacing=0.5)))
+        self.apply_prop(bar.GetLabelTextProperty(), **(text_style | dict(font_size=12, bold=False)))
 
         # right edge anchor at half height
         right_anchor = vtk.vtkCoordinate()
         right_anchor.SetCoordinateSystemToNormalizedViewport()
-        right_anchor.SetValue(1.0, 0.5)
+        right_anchor.SetValue(0.5, 0.039)
 
         # set distance to edge in pixels relative to anchor
         pos = bar.GetPositionCoordinate()
         pos.SetReferenceCoordinate(right_anchor)
         pos.SetCoordinateSystemToDisplay()
-        pos.SetValue(-120, -250)
+        pos.SetValue(-300, 0)
 
         # set bar width and height in pixels
         pos2 = bar.GetPosition2Coordinate()
         pos2.SetCoordinateSystemToDisplay()
-        pos2.SetValue(80, 500)
+        pos2.SetValue(600, 60)
 
         # apply colormap options
         match self.ui.coloring_mode:
@@ -1093,14 +1092,14 @@ class ScenePlotting:
                 table = 255*spectral_colormap(color.wavelengths(255))
                 lutm.SetTable(pv.convert_array(table.astype(np.uint8)))
                 self._ray_plot.mapper.SetScalarRange(go.wavelength_range)
-                self.scene.scalar_bar.label_format = "%-6.0f"
+                self.scene.scalar_bar.label_format = "%.0f"
 
             case ('Polarization xz' | "Polarization yz"):
                 self._ray_plot.mapper.SetScalarRange(0.0, 1.0)
 
             case 'Source':
                 bar.number_of_labels = len(self.raytracer.ray_sources)
-                bar.label_format = "%-6.0f"
+                bar.label_format = "%.0f"
                 if len(self.raytracer.ray_sources) > 1:
                     table = 255*color.spectral_colormap(np.linspace(440, 620, bar.number_of_labels))
                     lutm.SetTable(pv.convert_array(table.astype(np.uint8)))
