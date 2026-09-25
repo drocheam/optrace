@@ -83,7 +83,7 @@ class ScenePlotting:
         self.__ray_property_dict = {}  # properties of shown rays, set while tracing
         self._ray_property_dict = {}  # properties of shown rays, set after tracing
         self.ray_selection = None
-        
+
     # Helper Functions
     ###################################################################################################################
 
@@ -303,44 +303,58 @@ class ScenePlotting:
         # return linspace of full range with maximum label count
         return np.linspace(x0, x1, max_s+1)
 
-    def add_point_labels(self, points, labels, name="", font_family="courier", text_color = None,
-                         justification_horizontal="center", justification_vertical="center", visibility = True, 
+    def add_point_labels(self, points, labels, name="", font_family="courier", text_color=None,
+                         justification_horizontal="center", justification_vertical="center", visibility=True, 
                          **text_args):
-        """more performant replacement for pyvista.scene.add_point_labels"""
-        actors = []
+        """High-performance replacement for vtkBillboardTextActor3D using vtkLabeledDataMapper”"""
+        
+        # polydata object from points
+        poly_data = pv.PolyData(points)
+        
+        # append string data
+        vtk_strings = vtk.vtkStringArray()
+        vtk_strings.SetName("LabelTextArray")
+        for label in labels:
+            vtk_strings.InsertNextValue(str(label))
+        poly_data.GetPointData().AddArray(vtk_strings)
 
-        for point, label in zip(points, labels):
-            actor = vtk.vtkBillboardTextActor3D()
-            actor.SetInput(label)
-            actor.SetPosition(*point)
-            self.apply_prop(actor, name=name, pickable=False, force_opaque=True, visibility=visibility)
+        # create label mapper
+        label_mapper = vtk.vtkLabeledDataMapper()
+        label_mapper.SetInputData(poly_data)
+        label_mapper.SetLabelModeToLabelFieldData()
+        label_mapper.SetFieldDataName("LabelTextArray")
 
-            prop = actor.GetTextProperty()
-            self.apply_prop(prop, color=text_color, **text_args)
+        # set text settings
+        prop = label_mapper.GetLabelTextProperty()
+        self.apply_prop(prop, color=text_color, **text_args)
 
-            if font_family == "courier":
-                prop.SetFontFamilyToCourier()
-            elif font_family == "times":
-                prop.SetFontFamilyToTimes()
+        if font_family == "courier":
+            prop.SetFontFamilyToCourier()
+        elif font_family == "times":
+            prop.SetFontFamilyToTimes()
+        else:
+            prop.SetFontFamilyToArial()
 
-            if justification_horizontal == "right":
-                prop.SetJustificationToRight()
-            elif justification_horizontal == "center":
-                prop.SetJustificationToCentered()
-            else:
-                prop.SetJustificationToLeft()
+        if justification_horizontal == "right":
+            prop.SetJustificationToRight()
+        elif justification_horizontal == "center":
+            prop.SetJustificationToCentered()
+        else:
+            prop.SetJustificationToLeft()
 
-            if justification_vertical == "top":
-                prop.SetVerticalJustificationToTop()
-            elif justification_vertical == "center":
-                prop.SetVerticalJustificationToCentered()
-            else:
-                prop.SetVerticalJustificationToBottom()
+        if justification_vertical == "top":
+            prop.SetVerticalJustificationToTop()
+        elif justification_vertical == "center":
+            prop.SetVerticalJustificationToCentered()
+        else:
+            prop.SetVerticalJustificationToBottom()
 
-            actors.append(actor)
-            self.scene.renderer.AddActor(actor)
+        actor = vtk.vtkActor2D()
+        actor.SetMapper(label_mapper)
+        self.apply_prop(actor, name=name, pickable=False, visibility=visibility, dragable=False)
 
-        return actors
+        self.scene.renderer.AddActor(actor)
+        return [actor]
 
     def plot_axes(self) -> None:
         """plot cartesian axes"""
@@ -348,7 +362,7 @@ class ScenePlotting:
 
         ext = self.raytracer.outline
         args = dict(font_size=11, bold=True, font_family="courier", visibility=not self.ui.minimalistic_view,
-                    justification_horizontal="center", justification_vertical="center", 
+                    justification_horizontal="center", justification_vertical="center", italic=False, 
                     text_color=self._axis_color, shadow=not self.ui.high_contrast)
 
         # X
@@ -736,7 +750,7 @@ class ScenePlotting:
                      self._index_box_plots]:
             for obj in objs:
                 if obj[3] is not None:
-                    self.apply_prop(obj[3].GetTextProperty(), **opts)
+                    self.apply_prop(obj[3].mapper.label_text_property, **opts)
 
     def change_minimalistic_view(self) -> None:
         """Hide long labels, orientation axes and normal axes depending on if option minimalistic_view is set"""
@@ -750,18 +764,21 @@ class ScenePlotting:
         # shorten index plot description
         for rio in self._index_box_plots:
             if rio[3] is not None:
-                # label = rio[3].GetText()
-                text = rio[3].GetInput()
-                rio[3].SetInput(text.replace("ambient\n", "") if not show else ("ambient\n" + text))
+                string_array = rio[3].mapper.GetInput().GetPointData().GetAbstractArray("LabelTextArray")
+                text = string_array.GetValue(0)
+                string_array.SetValue(0, text.replace("ambient\n", "") if not show else ("ambient\n" + text))
+                string_array.Modified()
 
-        # remove descriptions from labels in minimalistic_view
+        # # remove descriptions from labels in minimalistic_view
         for Objects in [self._ray_source_plots, self._lens_plots, self._volume_plots, 
                         self._filter_plots, self._aperture_plots, self._detector_plots]:
             for num, obj in enumerate(Objects):
                 if obj[3] is not None and obj[4] is not None:
                     label = f"{obj[4].abbr}{num}"
                     label = label if obj[4].desc == "" or not show else label + ": " + obj[4].desc
-                    obj[3].SetInput(label)
+                    string_array = obj[3].mapper.GetInputDataObject(0, 0).GetPointData().GetAbstractArray("LabelTextArray")
+                    string_array.SetValue(0, label)
+                    string_array.Modified()
 
         for ax in self._axes_labels:
             ax.visibility = show
@@ -808,15 +825,15 @@ class ScenePlotting:
         # special case: point marker plots are just labels
         for el in self._point_marker_plots:
             if el[0] is not None:
-                el[0].GetTextProperty().color = self._marker_color
+                el[0].mapper.label_text_property.color = self._marker_color
 
         # update background colors of labels
         for objs in [self._lens_plots, self._detector_plots, self._aperture_plots, self._filter_plots,
                      self._point_marker_plots, self._line_marker_plots, self._volume_plots, self._ray_source_plots]:
             for obj in objs:
                 if len(obj) > 3 and obj[3] is not None:
-                    obj[3].GetTextProperty().background_color = self._background_color
-                    obj[3].GetTextProperty().color = self._foreground_color
+                    obj[3].mapper.label_text_property.background_color = self._background_color
+                    obj[3].mapper.label_text_property.color = self._foreground_color
 
         # change lens cylinder visibility
         for lens in self._lens_plots:
@@ -825,16 +842,16 @@ class ScenePlotting:
 
         # update axes color
         for ax in self._axes_labels:
-            ax.GetTextProperty().color = self._axis_color
-            ax.GetTextProperty().SetShadow(not high_contrast)
+            ax.mapper.label_text_property.color = self._axis_color
+            ax.mapper.label_text_property.shadow = not high_contrast
 
         # change index plot objects
         for obj in self._index_box_plots:
     
             if obj[3] is not None:
-                obj[3].GetTextProperty().frame_color = self._subtle_color
-                obj[3].GetTextProperty().color = self._axis_color
-                obj[3].GetTextProperty().SetShadow(not high_contrast)
+                obj[3].mapper.label_text_property.frame_color = self._subtle_color
+                obj[3].mapper.label_text_property.color = self._axis_color
+                obj[3].mapper.label_text_property.shadow = not high_contrast
 
             if obj[0] is not None:
                 obj[0].prop.color = self._outline_color
@@ -855,8 +872,8 @@ class ScenePlotting:
 
         # change scalar bar
         if len(self.scene.scalar_bars):
-            self.scene.scalar_bar.GetTitleTextProperty().color = self._foreground_color
-            self.scene.scalar_bar.GetLabelTextProperty().color = self._foreground_color
+            self.scene.scalar_bar.title_text_property.color = self._foreground_color
+            self.scene.scalar_bar.label_text_property.color = self._foreground_color
 
     def set_ray_opacity(self) -> None:
         """change the ray opacity"""
@@ -936,8 +953,9 @@ class ScenePlotting:
             det[1].position = np.array(det[1].position) + [0, 0, diff]
 
             # move label
-            det[3].SetPosition(np.array(det[3].GetPosition())+[0, 0, diff])
-            det[3].Modified()  # notify for replot
+            vtk_pts = det[3].mapper.GetInput().GetPoints()
+            vtk_pts.SetPoint(0, np.array(vtk_pts.GetPoint(0))+[0, 0, diff])
+            det[3].mapper.Modified()  # notify for replot
 
     def clear_ray_text(self) -> None:
         """clear the ray info text"""

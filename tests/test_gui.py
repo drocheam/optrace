@@ -1226,24 +1226,28 @@ class GUITests(unittest.TestCase):
                 RT.add(ot.PointMarker("Test1", [0., 0., 0]))
                 self._do_in_main(sim, sim.replot)
                 self.assertEqual(len(sim._plot._point_marker_plots), 1)  # element was added
-                center = sim._plot._point_marker_plots[0][0].GetPosition()
+                center = sim._plot._point_marker_plots[0][0].mapper.GetInputDataObject(0, 0).center
                 self.assertTrue(np.allclose(center, 0))  # check position
 
                 # marker 2, enlarged
                 RT.add(ot.PointMarker("Test2", [0., 1., 5.2], text_factor=2, marker_factor=2))
                 self._do_in_main(sim, sim.replot)
                 self.assertEqual(len(sim._plot._point_marker_plots), 2)  # element was added
-                center = sim._plot._point_marker_plots[1][0].GetPosition()
+                center = sim._plot._point_marker_plots[1][0].mapper.GetInputDataObject(0, 0).bounds[::2]
                 self.assertTrue(np.allclose(center- np.array([0, 1., 5.2]), 0, atol=1e-6, rtol=0))  # check position
 
                 # check size changes
                 a, b = tuple(sim._plot._point_marker_plots)
-                self.assertAlmostEqual(b[0].GetTextProperty().font_size/a[0].GetTextProperty().font_size, 2)
-                self.assertAlmostEqual(b[3].GetTextProperty().font_size/ a[3].GetTextProperty().font_size, 2)
+                self.assertAlmostEqual(b[0].mapper.label_text_property.font_size/
+                                       a[0].mapper.label_text_property.font_size, 2)
+                self.assertAlmostEqual(b[3].mapper.label_text_property.font_size/
+                                       a[3].mapper.label_text_property.font_size, 2)
 
                 # check if text was assigned correctly
-                self.assertEqual(a[3].GetInput(), "Test1")
-                self.assertEqual(b[3].GetInput(), "Test2")
+                self.assertEqual(a[3].mapper.GetInputDataObject(0, 0).GetPointData().\
+                                 GetAbstractArray("LabelTextArray").GetValue(0), "Test1")
+                self.assertEqual(b[3].mapper.GetInputDataObject(0, 0).GetPointData().\
+                                GetAbstractArray("LabelTextArray").GetValue(0), "Test2")
 
                 # check if marker crosshair is visible
                 self.assertTrue(a[0].visibility)
@@ -1291,11 +1295,14 @@ class GUITests(unittest.TestCase):
                 # check size change
                 a, b = tuple(sim._plot._line_marker_plots)
                 self.assertAlmostEqual(b[0].prop.line_width/a[0].prop.line_width, 2)
-                self.assertAlmostEqual(b[3].GetTextProperty().font_size/a[3].GetTextProperty().font_size, 2)
+                self.assertAlmostEqual(b[3].mapper.label_text_property.font_size/
+                                       a[3].mapper.label_text_property.font_size, 2)
 
                 # check if text was assigned correctly
-                self.assertEqual(a[3].GetInput(), "Test1")
-                self.assertEqual(b[3].GetInput(), "Test2")
+                self.assertEqual(a[3].mapper.GetInputDataObject(0, 0).GetPointData().\
+                                 GetAbstractArray("LabelTextArray").GetValue(0), "Test1")
+                self.assertEqual(b[3].mapper.GetInputDataObject(0, 0).GetPointData().\
+                                 GetAbstractArray("LabelTextArray").GetValue(0), "Test2")
 
                 # check replotting of markers
                 self._do_in_main(sim, sim.run_command, "RT.remove(ML[-1])") # also checks that alias ML exists
