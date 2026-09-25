@@ -289,3 +289,21 @@ It is important to note that only some actions use multithreading,
 and only a few functions work with all available/specified cores. 
 Setting the CPU count only provides an upper limit.
 
+Performance issues on Wayland
+_____________________________________
+
+vtk support for Wayland under Linux is still relatively new,
+with a worse performance especially for scenes with many text labels.
+
+Before running Python, set the following environment variable, so the X11 windowing system is used instead:
+
+.. code-block:: bash
+
+   export QT_QPA_PLATFORM=xcb
+
+It can alternatively be set inside a Python script:
+
+.. code-block:: python
+
+   import os
+   os.environ.setdefault("QT_QPA_PLATFORM", "xcb")
