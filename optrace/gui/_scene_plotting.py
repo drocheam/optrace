@@ -164,7 +164,7 @@ class ScenePlotting:
 
         # update view_up from new normal and old cross product of direction and view_up
         up = np.cross(cam.direction, -right)
-        if up.sum():
+        if not np.allclose(up, 0.0):
             cam.up = up
         else:  # parallel -> use axis orthogonal to direction change
             cam.up = np.cross(cam.direction, -np.array(old_normal))
@@ -183,8 +183,17 @@ class ScenePlotting:
         When parameter initial_camera is not set, it is a y-side view with all elements inside the viewable range
         When it is set, the camera properties are applied.
         """
-        self.scene.view_vector((-1, 0, 0), viewup=(0, 1, 0), render=False)
-        self.scene.camera.parallel_scale *= 0.90
+        # set default view: z-axis in right direction, tight fitting view, focal point at scene center
+        dim = np.diff(self.raytracer.outline)[::2][::2]
+        height = max(dim[1], dim[0]*self.scene.width()/self.scene.height())/2
+        center = (self.raytracer.outline[::2] + self.raytracer.outline[1::2])/2
+        
+        self.scene.reset_camera()
+        self.scene.parallel_projection = True
+        self.scene.camera.up = (0, 1, 0)
+        self.set_camera(direction=(1, 0, 0), roll=0, height=height, center=center)
+
+        # apply user defined settings
         self.set_camera(**self._initial_camera)
 
     # Element Plotting
