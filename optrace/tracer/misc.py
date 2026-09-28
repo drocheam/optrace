@@ -8,19 +8,23 @@ import numpy as np  # calculations
 
 def cpu_count() -> int:
     """
-    Number of logical cpu cores assigned to this process (Python >= 3.13)
-    Number of logical cpu cores (Python < 3.13)
+    Get number of threads for multithreading.
+    Uses cpu_count:
+    - Number of logical cpu cores assigned to this process (Python >= 3.13)
+    - Number of logical cpu cores (Python < 3.13)
     Can be overridden by setting the PYTHON_CPU_COUNT environment variable or running python -X cpucores
     Setting by PYTHON_CPU_COUNT must be between 1-64.
+
+    Without overriding, the cpu count (N <= 4) or 2/3 (N > 4) of this value is used.
 
     :return: cpu count
     """
     count = os.process_cpu_count() if hasattr(os, "process_cpu_count") else os.cpu_count()
-    count = count or 1
+    count = count or 1  # cpu_count returns None if undetermined
+    if count > 4:
+        count = int(count*2/3)
 
-    # while cpu_count and process_cpu_count handle the PYTHON_CPU_COUNT by now,
-    # this was not the case for Python < 3.13
-    # additionally, it also does not seem to work when the env variable is set at runtime?
+    # overwrite count from setting in environment
     if "PYTHON_CPU_COUNT" in os.environ:
         count = int(os.environ["PYTHON_CPU_COUNT"])
 

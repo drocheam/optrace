@@ -262,7 +262,11 @@ ___________________________________________________
 
 optrace supports setting the number of available cores, which corresponds to the maximum number of threads that will
 be used for the computations.
-The setting can be either applied as Python argument:
+By default, two thirds of logical CPUs available to the process are used for values above 4 CPUs.
+Below or equal to 4, all CPU are employed.
+
+This value can be overwritten with an external setting, 
+for instance to specify the number of physical performance cores:
 
 .. code-block:: bash
 

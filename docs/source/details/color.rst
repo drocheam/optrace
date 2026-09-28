@@ -301,7 +301,7 @@ Plenty of negative examples for color representation can be found in literature
 (`Link1 <https://clarkvision.com/articles/color-cie-chromaticity-and-perception/color-rgb-xy-cie1931-diagram1g1000spjfjl1-1000-ciesrgb-axes-waveticks-c1-srgb-800.jpg>`__,
 `Link2 <https://medium.com/hipster-color-science/a-beginners-guide-to-colorimetry-401f1830b65a>`__,
 `Link3 <https://www.faes.de/NN_in_der_Farbmetrik/NN_Erklaerung_Farbraum/cie-normfarbtafel.jpg>`__,
-`Link4 <https://d1hjkbq40fs2x4.cloudfront.net/2017-06-05/files/perceptual-vs-absolute-rendering-intents_1621-2.jpg>`__).
+`Link4 <https://web.archive.org/web/20241001111808/https://d1hjkbq40fs2x4.cloudfront.net/2017-06-05/files/perceptual-vs-absolute-rendering-intents_1621-2.jpg>`__).
 
 In most cases, negative sRGB values were simply clipped, leading to distortions not only in saturation but also 
 in hue and brightness. For example, colors near 510 nm are rendered as deep green instead 
