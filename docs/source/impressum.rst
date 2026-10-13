@@ -1,8 +1,9 @@
 
 :orphan:
 
-.. meta::
-   :robots: noindex
+.. raw:: html
+
+   <meta name="robots" content="noindex">
 
 .. _impressum:
 
@@ -11,16 +12,14 @@ Impressum / Imprint
 
 Impressum nach § 5 TMG / § 55 RStV:
 
-.. Use image so address and mail can't be crawled easily
-
-.. image:: ./images/contact.png
-   :class: contact-image
-   :align: left
-
+| Damian Mendroch
+| |ADDRESS1|
+| |ADDRESS2|
+| |ADDRESS3|
+| 50679 Köln
 |
-|
-|
-|
+| Telefon: |PHONE|
+| E-Mail: |EMAIL|
 |
 |
 

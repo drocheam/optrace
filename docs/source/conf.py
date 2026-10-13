@@ -9,6 +9,7 @@
 #
 import os
 import sys
+import base64
 import datetime
 
 sys.path.insert(0, os.path.abspath('..'))
@@ -29,6 +30,15 @@ release = metadata["version"]
 author = metadata["author"]
 copyright = f"{datetime.date.today().year}, {author}"
 language = "en"
+
+# obfuscate imprint contact information in repo against crawling by using base64
+rst_prolog = f"""
+.. |ADDRESS1| replace:: {base64.b64decode("SW5zdGl0dXQgZsO8ciBBbmdld2FuZHRlIE9wdGlrIHVuZCBFbGVrdHJvbmlr").decode("utf-8")}
+.. |ADDRESS2| replace:: {base64.b64decode("VGVjaG5pc2NoZSBIb2Noc2NodWxlIEvDtmxu").decode("utf-8")}
+.. |ADDRESS3| replace:: {base64.b64decode("QmV0emRvcmZlciBTdHJhw59lIDI=").decode("utf-8")}
+.. |PHONE| replace:: {base64.b64decode("KzQ5IDE1NiA3OTMyIDE3NzY=").decode("utf-8")}
+.. |EMAIL| replace:: {base64.b64decode("ZG1lbmRyb2NoQHByb3Rvbi5tZQ==").decode("utf-8")}
+"""
 
 # -- General configuration ---------------------------------------------------
 

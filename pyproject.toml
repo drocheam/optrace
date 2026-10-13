@@ -2,8 +2,8 @@
 [project]
 name = "optrace"
 dynamic = ["version"]
-authors = [{name = "Damian Mendroch", email =  "damian.mendroch@th-koeln.de"}]
-maintainers = [{name = "Damian Mendroch", email = "damian.mendroch@th-koeln.de"}]
+authors = [{name = "Damian Mendroch", email =  "dmendroch@proton.me"}]
+maintainers = [{name = "Damian Mendroch", email = "dmendroch@proton.me"}]
 description = "An optics simulation package with sequential raytracing, image rendering and a GUI frontend" 
 keywords = ["simulation", "optics", "raytracing"]
 readme = "ReadMe.md"

@@ -122,11 +122,20 @@ assert "[[ $(count_cookies 'https://www.google.com/') != '0' ]]"
 echo "Cookie checks finished"
 
 # check that the website does not load external resources
-assert "[ -z "$(scan_external_resources 'https://drocheam.github.io/optrace/index.html')" ] || echo true"
-assert "[ -z "$(scan_external_resources 'https://drocheam.github.io/optrace/details/matrix_analysis.html')" ] || echo true"
+assert "[[ -z \"$(scan_external_resources 'https://drocheam.github.io/optrace/index.html')\" ]]"
+assert "[[ -z \"$(scan_external_resources 'https://drocheam.github.io/optrace/examples.html')\" ]]"
+assert "[[ -z \"$(scan_external_resources 'https://drocheam.github.io/optrace/details/matrix_analysis.html')\" ]]"
 # check the script by checking a page with external scripts and fonts
-assert "scan_external_resources 'https://shibuya.lepture.com/'"
+assert "[[ -n \"$(scan_external_resources 'https://shibuya.lepture.com/')\" ]]"
 echo "Resource checks finished"
+
+# check that imprint contains phone and mail
+imprint=$(curl -sL 'https://drocheam.github.io/optrace/impressum.html')
+mail=$(echo "$imprint" | grep -Eio '[a-zA-Z0-9._%+-]+&#37;&#52;&#48;[a-zA-Z0-9.-]+&#46;[a-zA-Z]{2,}')
+phone=$(echo "$imprint" | grep -Eio '\+49[ ]?1[567][0-9][ ]?[0-9]{4}[ ]?[0-9]{4}')
+assert "[[ -n \"$mail\" ]]"
+assert "[[ -n \"$phone\" ]]"
+echo "Imprint checks finished"
 
 # exit with non zero status code when errors occurred
 [[ $counter != 0 ]] && exit 1
