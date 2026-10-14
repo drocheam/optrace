@@ -9,8 +9,8 @@ keywords = ["simulation", "optics", "raytracing"]
 readme = "ReadMe.md"
 license = {text = "MIT License"}
 requires-python = ">=3.11,<3.15"
-dependencies = ["numpy", "chardet", "scipy", "opencv-python-headless", "pyqtdarktheme-fork", "pyside6", 
-"matplotlib", "tqdm", "pyvista", "pyvistaqt", "vtk", "traitsui"]
+dependencies = ["numpy", "chardet", "scipy", "opencv-python-headless", "pyside6", "matplotlib", "tqdm", 
+"pyvista", "pyvistaqt", "vtk", "traitsui"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -53,7 +53,7 @@ build-backend = "setuptools.build_meta"
 packages.find.include =  ["optrace*"]
 include-package-data = false
 dynamic = {version = {attr = "optrace.metadata.version"}}
-package-data = {optrace = ["resources/*", "resources/images/*"]}  
+package-data = {optrace = ["resources/*", "resources/images/*", "resources/ui/*"]}  
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

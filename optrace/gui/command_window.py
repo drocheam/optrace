@@ -14,7 +14,7 @@ class CommandWindow(HasTraits):
     cmd:                  Str = Str()  #: command to run
     history:              List = List()  #: command history
 
-    _execute_label:       Str = Str('Command:')
+    _execute_label:       Str = Str('Code:')
     _history_label:       Str = Str('History:')
     _whitespace_label:    Str = Str()
 

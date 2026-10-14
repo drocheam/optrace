@@ -52,9 +52,6 @@ This project is not affiliated with a package of the same name on PyPI.
    * - `opencv-python-headless <https://pypi.org/project/opencv-python-headless/>`_
      - image loading, saving and resizing
      - Apache 2.0
-   * - `pyqtdarktheme-fork <https://pypi.org/project/pyqtdarktheme-fork/>`_
-     - setting a QT dark theme
-     - MIT
    * - `pyside6 <https://wiki.qt.io/Qt_for_Python>`_
      - Qt GUI backend
      - LGPLv3

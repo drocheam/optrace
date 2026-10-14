@@ -1715,11 +1715,6 @@ class TraceGUI(HasTraits):
                 self._command_window_view = self.command_window.edit_traits()
         else:
             self._command_window_view.control.window().raise_()
-            
-        # code editor does not work correctly with dark mode, so we need to change the design
-        bgcolor = "#aaa" if global_options.ui_dark_mode else "white"
-        self._command_window_view.control.window().\
-                setStyleSheet(f"QAbstractScrollArea{{font-family: monospace; background-color: {bgcolor}; color: black}}")
     
     @observe('_help_button', dispatch="ui", post_init=True)
     def open_documentation(self, event: TraitChangeEvent = None) -> None:

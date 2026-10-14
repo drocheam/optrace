@@ -41,18 +41,6 @@ html {
     border-bottom: 1px solid var(--yue-c-link-border)
 }
 
-/*invert contact image in dark mode*/
-html.dark .contact-image {
-    filter: invert() !important
-}
-
-/*unset padding and background color of contact image*/
-.contact-image {
-    background-color: unset !important;
-    padding: unset;
-    height: 140px;
-    margin-left: 0px !important
-}
 
 /*fix color and spacing of bullet point lists*/
 .yue li {

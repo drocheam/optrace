@@ -1,0 +1,211 @@
+/** <var> are replaced by values in optrace.plots.init **/
+
+QWidget {
+    background-color: <bg>;
+    color: <fg>;
+}
+
+QCheckBox:disabled, QComboBox:disabled, QLabel:disabled {
+    color: <fg_disabled>;
+}
+
+QGroupBox {
+    color: <fg>;
+    font-weight: bold;
+}
+
+QTabBar::tab {
+    background-color: <button>;
+    color: <fg_disabled>;
+    padding: 6px 8px;
+    border: 1px solid <border>;
+    border-bottom: none;
+}
+
+QTabWidget::pane {
+    margin: 0px;
+    padding: 0px;
+    border: 1px solid <border>;
+    border-right: none;
+    border-bottom: none;
+    margin-top: -1px;
+}
+
+QTabBar::tab:selected {
+    background-color: <bg>;
+    color: <fg>;
+}
+
+QTabBar::tab:!selected {
+    background-color: <button>;
+    color: <fg_disabled>;
+    border-bottom: 1px solid <border>;
+    padding-bottom: 5px;
+}
+
+QLineEdit,
+QLineEdit:read-only,
+QTextEdit,
+QPlainTextEdit,
+QListView,
+QTreeView,
+QTableView,
+QAbstractScrollArea {
+    background-color: <panel>;
+    color: <fg>;
+    selection-background-color: <selection>;
+    selection-color: white;
+}
+
+QLineEdit,
+QTextEdit,
+QPlainTextEdit {
+    border-radius: 3px;
+    border: 1px solid <border>;
+    padding: 3px;
+}
+
+QSpinBox:focus,
+QDoubleSpinBox:focus,
+QLineEdit:focus,
+QTextEdit:focus,
+QPlainTextEdit:focus {
+    border: 1px solid <selection>;
+}
+
+QLineEdit:disabled,
+QTextEdit:disabled,
+QPlainTextEdit:disabled {
+    color: <fg_disabled>;
+    background-color: <panel>;
+}
+
+QAbstractScrollArea::viewport {
+    background-color: <panel>;
+    color: <fg>;
+}
+
+QSlider::groove {
+    background: <panel>;
+    height: 6px;
+}
+
+QSlider::sub-page:horizontal {
+    background: <selection>;
+    border-radius: 3px;
+    border: 1px solid <border>;
+}
+
+QSlider::add-page {
+    background: <panel>;
+    border-radius: 3px;
+    border: 1px solid <border>;
+}
+
+QSlider::handle {
+    background: <selection>;
+    color: <fg>;
+    width: 14px;
+    margin: -4px 0;
+    border-radius: 5px;
+}
+
+QPushButton {
+    background-color: <button>;
+    color: <fg>;
+}
+
+QTabBar::tab:!selected:hover,
+QCheckBox::indicator:hover,
+QSpinBox::down-arrow:hover,
+QDoubleSpinBox::down-arrow:hover,
+QComboBox:hover,
+QSpinBox::up-arrow:hover,
+QDoubleSpinBox::up-arrow:hover,
+QPushButton:hover {
+    background-color: <hover>;
+}
+
+QCheckBox::indicator:checked:hover,
+QSlider::handle:hover {
+    background-color: <hover_selection>;
+}
+
+QSpinBox, QDoubleSpinBox {
+    background-color: <panel>;
+    color: <fg>;
+    padding: 2px;
+    border: 1px solid <border>;
+    border-radius: 3px;
+}
+
+QSpinBox::up-button,
+QDoubleSpinBox::up-button,
+QSpinBox::down-button,
+QDoubleSpinBox::down-button {
+    background-color: <button>;
+    border: 1px solid <border>;
+    width: 16px;
+}
+
+QSpinBox::up-button,
+QDoubleSpinBox::up-button {
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+    border-top-right-radius: 3px;
+}
+
+QSpinBox::down-button,
+QDoubleSpinBox::down-button {
+    subcontrol-origin: border;
+    subcontrol-position: bottom right;
+    border-bottom-right-radius: 3px;
+}
+
+QSpinBox::up-arrow,
+QDoubleSpinBox::up-arrow {
+    image: url("<upmark>");
+    width: 16px;
+    height: 8px;
+}
+
+QSpinBox::down-arrow,
+QDoubleSpinBox::down-arrow {
+    image: url("<downmark>");
+    width: 16px;
+    height: 8px;
+}
+
+QComboBox {
+    padding: 4px 18px 4px 8px;
+    background-color: <button>;
+}
+
+QCheckBox::indicator{
+    background-color: <panel>;
+    border: 1px solid <border>;
+    border-radius: 4px;
+    height: 16px;
+    width: 16px;
+    margin: 2px;
+}
+
+QCheckBox::indicator:checked {
+    image: url("<checkmark>");
+    background-color: <selection>;
+}
+
+AdvancedCodeWidget QPlainTextEdit {
+    font-family: "Consolas", "Courier New", "DejaVu Sans Mono", monospace;
+    background-color: <code>;
+    margin: 0px;
+    padding: 0px;
+    color: black;
+}
+
+QToolTip {
+    background-color: <panel>;
+    color: <fg>;
+    border: 1px solid <border>;
+    padding: 1px;
+}
