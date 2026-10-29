@@ -89,7 +89,6 @@ class ExampleTests(unittest.TestCase):
     
     @pytest.mark.slow
     @pytest.mark.os
-    @pytest.mark.skipif(sys.platform=="darwin", reason="Currently issues with Github macOS runner")  # TODO fix
     def test_microscope(self):
         self._run_file(Path.cwd() / "examples" / "microscope.py", 50)
     
@@ -119,7 +118,6 @@ class ExampleTests(unittest.TestCase):
         self._run_file(Path.cwd() / "examples" / "hurb_apertures.py")
     
     @pytest.mark.os
-    @pytest.mark.skipif(sys.platform=="darwin", reason="Currently issues with Github macOS runner")  # TODO fix
     def test_eye_model(self):
         self._run_file(Path.cwd() / "examples" / "arizona_eye_model.py")
     
