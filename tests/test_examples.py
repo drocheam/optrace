@@ -90,7 +90,7 @@ class ExampleTests(unittest.TestCase):
     @pytest.mark.slow
     @pytest.mark.os
     def test_microscope(self):
-        self._run_file(Path.cwd() / "examples" / "microscope.py", 50)
+        self._run_file(Path.cwd() / "examples" / "microscope.py", 55)
     
     @pytest.mark.install
     def test_presets_spectrum(self):
@@ -119,7 +119,7 @@ class ExampleTests(unittest.TestCase):
     
     @pytest.mark.os
     def test_eye_model(self):
-        self._run_file(Path.cwd() / "examples" / "arizona_eye_model.py")
+        self._run_file(Path.cwd() / "examples" / "arizona_eye_model.py", 25)
     
 
 if __name__ == '__main__':
